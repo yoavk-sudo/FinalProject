@@ -1,27 +1,27 @@
-﻿using System.Numerics;
-using System.Reflection;
-using System.Security.Cryptography.X509Certificates;
-
-namespace FinalProject
+﻿namespace FinalProject
 {
     internal static class HUD
     {
+        const int STARTINGPOS = 60;
         static public void DisplayHUD(Player player)
         {
-            PrintBorders();
-            int x = 75;
-            int y = 14;
-            PrintHudLine($"{player.PlayerName}", x, ref y, ConsoleColor.White);
-            PrintHudLine($"HP:           {player.HP}", x, ref y, ConsoleColor.Green);
-            PrintHudLine($"MP:           {player.MP}", x, ref y, ConsoleColor.Blue);
-            PrintHudLine($"Power:        {player.Damage}", x, ref y, ConsoleColor.Magenta);
-            PrintHudLine($"Evasion:      {player.Evasion}", x, ref y, ConsoleColor.White);
-            PrintHudLine($"Gold:         {player.Gold}", x, ref y, ConsoleColor.Yellow);
-            PrintHudLine($"Level:        {player.Level}", x, ref y, ConsoleColor.DarkYellow);
-            PrintHudLine($"EXP:          {player.Experience}%", x, ref y, ConsoleColor.Cyan);
-            Console.ResetColor();
-            Inventory.InventoryDisplay();
-            Console.SetCursorPosition(0, 0);
+            lock (LockMethods.ActionLock)
+            {
+                PrintBorders();
+                int x = STARTINGPOS + 3;
+                int y = 14;
+                PrintHudLine($"{player.PlayerName}", x, ref y, ConsoleColor.White);
+                PrintHudLine($"HP:           {player.HP}", x, ref y, ConsoleColor.Green);
+                PrintHudLine($"MP:           {player.MP}", x, ref y, ConsoleColor.Blue);
+                PrintHudLine($"Power:        {player.Damage}", x, ref y, ConsoleColor.Magenta);
+                PrintHudLine($"Evasion:      {player.Evasion}", x, ref y, ConsoleColor.White);
+                PrintHudLine($"Gold:         {player.Gold}", x, ref y, ConsoleColor.Yellow);
+                PrintHudLine($"Level:        {player.Level}", x, ref y, ConsoleColor.DarkYellow);
+                PrintHudLine($"EXP:          {player.Experience}%", x, ref y, ConsoleColor.Cyan);
+                Console.ResetColor();
+                //Inventory.InventoryDisplay();
+                Console.SetCursorPosition(0, 0);
+            }
         }
         private static void PrintHudLine(string stat, int x, ref int y, ConsoleColor colour)
         {
@@ -38,14 +38,14 @@ namespace FinalProject
         private static void PrintBorders()
         {
             Console.ForegroundColor= ConsoleColor.Blue;
-            Console.SetCursorPosition(72, 12);
+            Console.SetCursorPosition(STARTINGPOS, 12);
             Console.Write("╔════════════════════╗");
             for (int i = 0; i < 11; i++)
             {
-                Console.SetCursorPosition(72, 13 + i);
+                Console.SetCursorPosition(STARTINGPOS, 13 + i);
                 Console.Write("║                    ║");
             }
-            Console.SetCursorPosition(72, 23);
+            Console.SetCursorPosition(STARTINGPOS, 23);
             Console.Write("╚════════════════════╝");
         }
         public static void UpdateHUD(Player player, Stats stat)

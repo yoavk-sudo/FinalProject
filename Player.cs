@@ -1,4 +1,5 @@
-﻿using FinalProject.Magic;
+﻿using FinalProject.Elements;
+using FinalProject.Magic;
 
 namespace FinalProject
 {
@@ -9,7 +10,29 @@ namespace FinalProject
         int _manaRegen = 0;
         int _manaCounter = 5;
         private int _counter = 0;
+        const int TRAPDAMAGE = 1;
+        const int MAXGOLD = 9999;
+        Weapon weapon = new Weapon("nothing", 0);
+        Armor armor = new Armor("nothing", 0);
+        public Player(string name)
+        {
+            this.PlayerName = name;
+            this.HP = _maxHP;
+            this.MP = _maxMP;
+            Console.CursorVisible = false;
+        }
 
+        #region LockAsyncSetCursor
+        private void LockWriteTrapVisible()
+        {
+            lock (LockMethods.ActionLock)
+            {
+                Console.SetCursorPosition(Coordinates[0], Coordinates[1]);
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.Write('#');
+                Console.ResetColor();
+            }
+        }
         private void UpdateCoordinates(int x, int y)
         {
             lock (LockMethods.ActionLock)
@@ -31,6 +54,8 @@ namespace FinalProject
                 Console.ForegroundColor = Spells.spells[spell].Col;
                 Console.Write(Spells.spells[spell].Symbol);
                 Console.ResetColor();
+                this.MP -= Spells.spells[spell].MPCost;
+                HUD.DisplayHUD(this);
                 return magicCoor;
             }
         }
@@ -42,22 +67,16 @@ namespace FinalProject
                 Console.ForegroundColor = ConsoleColor.Blue;
                 Console.Write(avatar); //print player at new coordinates
                 Console.ResetColor();
-                Console.SetCursorPosition(0, 20);
+                //Console.SetCursorPosition(0, 20);
             }
         }
         private void TrySetCursorInRange()
         {
             Console.SetCursorPosition(Coordinates[0], Coordinates[1] - 1);
         }
+        #endregion
 
         //constructor
-        public Player(string name)
-        {
-            this.PlayerName = name;
-            this.HP = _maxHP;
-            this.MP = _maxMP;
-            Console.CursorVisible = false;
-        }
         #region Player Stats
         //attributes //will need to become private
         public string PlayerName
@@ -130,10 +149,10 @@ namespace FinalProject
         }
 
         #region Player passive "actions"
-        public void TakeDamage(int damage)
+        public void TakeDamage(int damage, bool _isTrap)
         {
             float rand = new Random().Next(1, 11);
-            if (rand <= this.Evasion)
+            if (rand <= this.Evasion && !_isTrap)
             {
                 Log.PrintMessage("You evaded an attack!", ConsoleColor.White);
                 return;
@@ -154,6 +173,7 @@ namespace FinalProject
             if(HP == _maxHP) return;
             int logHeal = 0;
             if(_maxHP >= HP + healAmount) logHeal = healAmount;
+            else logHeal = _maxHP - HP;
             //else logHeal = _maxHP - HP;
             HP += healAmount;
             if (HP > _maxHP)
@@ -175,35 +195,32 @@ namespace FinalProject
             if (this.MP >= this._maxMP) return;
             this.MP++;
         }
+        public void GetGold(int goldAmount)
+        {
+            Gold += goldAmount;
+            Log.PrintMessage($"Got {goldAmount} gold!", ConsoleColor.Yellow);
+            if (Gold > MAXGOLD) Gold = MAXGOLD;
+            HUD.DisplayHUD(this);
+        }
         #endregion
         #region Player actions
-
-        // Describes certain features of target, 3 steps ahead at most.
-        // Need add direction + Inspect info
-        // add Inspect levels?
-        public void Inspect() 
-        {
-            for (int i = 1; i < 4; i++)
-            {
-                if (this.Coordinates[1] + i == 1)
-                {
-                    Console.WriteLine("Something here! Appraise:");
-                    break;
-                }    
-            }
-        }
         public async Task CastSpell(char input)
         {
             int spell;
+            bool isHeal = false;
             switch(input)
             {
                 case 'v':
                     spell = Spells.FindSpell(typeof(FireBall));
                     break;
+                case 'u':
+                    spell = Spells.FindSpell(typeof(Heal));
+                    isHeal = true;
+                    break;
                 case 'm':
                     spell = Spells.FindSpell(typeof(Lightning));
                     break;
-                default: 
+                default:
                     return;
             }
             if (spell == -1) return;
@@ -218,33 +235,16 @@ namespace FinalProject
                 Log.PrintMessage("Not enough MP!", ConsoleColor.Red);
                 return;
             }
+            if (isHeal) this.Heal(Magic.Heal.Power);
             int[] XY = DirectionToXY();
-            try
-            {
-                if (Map.MapCol[Coordinates[0] + XY[0], Coordinates[1] + XY[1]] == 1) return; //if obstructed
-            }
-            catch (System.IndexOutOfRangeException)
-            {
-                Console.WriteLine("2");
-            }
+            if (Map.WhatIsInNextTile(Coordinates, XY) == 1) return; //if obstructed
             Spells.ClearSpellSlate();
-            //int x = Coordinates[0] + XY[0];
-            //int y = Coordinates[1] + XY[1];
-            int[] magicCoor = GetCoordinates(XY, spell);
-            ////int[] magicCoor = GetCoordinates();
-            ////magicCoor[0] += XY[0];
-            ////magicCoor[1] += XY[1];
-            ////Console.SetCursorPosition(magicCoor[0], magicCoor[1]);
-            ////Console.ForegroundColor = Spells.spells[spell].Col;
-            ////Console.Write(Spells.spells[spell].Symbol);
-            ////Console.ResetColor();
-            this.MP -= Spells.spells[spell].MPCost;
-            HUD.DisplayHUD(this);
             Console.Beep(150, 100);
             Spells.spells[spell].Charge = 0;
+            if (isHeal) return;
+            int[] magicCoor = GetCoordinates(XY, spell);
             Spells.DisplaySpells();
-            Task<dynamic> t = await Task.Run(() => Spells.MoveSpell(Spells.spells[spell], magicCoor, Direction));
-            Console.WriteLine("DFG");
+            Task<int> t = await Task.Run(() => Spells.MoveSpell(Spells.spells[spell], magicCoor, Direction));
         }
         private async Task MoveCollision(char input)
         {
@@ -272,67 +272,61 @@ namespace FinalProject
             try
             {
                 TrySetCursorInRange();
-                //Console.SetCursorPosition(Coordinates[0], Coordinates[1] - 1);
             }
-            catch(System.ArgumentOutOfRangeException)   // (System.IndexOutOfRangeException) 
+            catch (System.ArgumentOutOfRangeException)
             {
                 Console.WriteLine("1");
             }
-            //raise all spell charges///////////////////////////////////////////////////////////////////////////////////////
             int[] XY = DirectionToXY();
-            try
+            if (Map.WhatIsInNextTile(Coordinates, XY) == 2)
             {
-                if(Map.MapCol[Coordinates[0] + XY[0], Coordinates[1] + XY[1]] == 1) //if obstructed
-                {
-                    //Console.SetCursorPosition(Coordinates[0], Coordinates[1]); //position at current coordinates
-                    //Console.ForegroundColor = ConsoleColor.Blue;
-                    //Console.Write(input); //print player at current coordinates, new direction
-                    //Console.ResetColor();
-                    DrawPlayer(input);
-                    return;
-                }
+                Map.LoadNextLevel(this);
+                return;
             }
-            catch(System.IndexOutOfRangeException)
+            if (Map.WhatIsInNextTile(Coordinates, XY) == 1) //if obstructed
             {
-                Console.WriteLine("2");
+                if (ElementsList.ElementByCoordinates(Coordinates) == '#') Console.BackgroundColor = ConsoleColor.Red;
+                DrawPlayer(input);
+                return;
             }
             //if not obstructed
-            LockMethods.SetCursorLockAndOneSpace(Coordinates, 0, 0);//erase current player marker
+            LockMethods.SetCursorLockAndOneSpace(Coordinates);//erase current player marker
+            if (ElementsList.ElementByCoordinates(Coordinates) == '#') LockWriteTrapVisible();
             UpdateCoordinates(XY[0], XY[1]); //move up or down 1 tile
+            if (ElementsList.ElementByCoordinates(Coordinates) == '#')
+            {
+                TakeDamage(TRAPDAMAGE, true);
+                ElementsList.InteractWithElement(Coordinates, this);
+                Console.BackgroundColor = ConsoleColor.Red;
+            }
             DrawPlayer(input);
-            //Console.SetCursorPosition(Coordinates[0], Coordinates[1]); //position at new coordinates
-            //Console.ForegroundColor = ConsoleColor.Blue;
-            //Console.Write(input); //print player at new coordinates
-            //Console.ResetColor();
-            //Console.SetCursorPosition(0, 20);
-            Console.Beep(105, 100);
             Spells.RechargeSpells(); //Recharge spells
             Spells.DisplaySpells();
             HUD.DisplayHUD(this);
         }
         public async Task Move(char direction)
         {
-            MoveCollision(direction);
+            await MoveCollision(direction);
             MPRegen();
-            //HUD.UpdateHUD(this, HUD.Stats.MP);
         }
-        public void BasicAttack()
-        {
-
-        }
-        
-        //Upon trying to interact, inspect coordinates in front of player
-        //for this, 
         public void Interact()
         {
             int[] XY = DirectionToXY();
-            if(Map.MapCol[Coordinates[0] + XY[0], Coordinates[1] + XY[1]] == 1)
-            {
-                //check list of objects in seperate class,
-                //go through each object and check if its coordinates corrospond
-                //with the one that was checked
-                //if such an object was found, call an appropriate method
-            }
+            int[] inFront = {Coordinates[0] + XY[0], Coordinates[1] + XY[1]};
+            if (ElementsList.ElementByCoordinates(inFront) == '#') return; //Don't interact with traps
+            if (EnemyList.EnemyByCoordinates(inFront) != null) DealDamage(inFront, Damage); //basic attack
+            ElementsList.InteractWithElement(inFront, this);
+        }
+        void DealDamage(int[] cor, int dmg)
+        {
+            if(EnemyList.EnemyByCoordinates(cor) == null) return;
+        }
+        public void UsePotion()
+        {
+            if(!Inventory.IsInInventory('ß')) return;
+            int healAmount = _maxHP / 2;
+            Heal(healAmount);
+            Inventory.RemoveFromInventory('ß');
         }
         #endregion
     }

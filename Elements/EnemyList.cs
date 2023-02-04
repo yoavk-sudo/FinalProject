@@ -3,7 +3,7 @@
     internal static class EnemyList
     {
         static List<Enemy> Enemies = new List<Enemy>();
-        static public Enemy EnemyByCoordinates(int[] cor)
+        static public Enemy? EnemyByCoordinates(int[] cor)
         {
             foreach (Enemy enemy in Enemies)
             {

@@ -1,14 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace FinalProject
+﻿namespace FinalProject
 {
     internal class Weapon
     {
-        string _weaponName;
+        string ? _weaponName;
         int _damage;
         
         public Weapon(string name, int damage)

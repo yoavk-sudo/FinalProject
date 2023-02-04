@@ -11,6 +11,7 @@ namespace FinalProject
         int _diff; // 0 or 1 = easy or hard
         readonly int _gold;
         int _exp;
+        const int MAXRANGE = 5;
         static List<Enemy> enemies = new List<Enemy>();
         //Constructor
         public Enemy(string type, int maxHP, int power)
@@ -31,6 +32,22 @@ namespace FinalProject
             Enemy enemy = new Enemy(eType, hp, pow);
             return enemy;
         }
+        
+        private void LockEnemyMoveCoordinates(int dirX, int dirY)
+        {
+            if (Map.WhatIsInNextTile(Coordinates, new int[]{ dirX, dirY }) != 0) return;
+            LockMethods.SetCursorLockAndOneSpace(Coordinates); //if not obstructed
+            Coordinates[0] += dirX;
+            Coordinates[1] += dirY;
+            lock (LockMethods.ActionLock)
+            {
+                Console.SetCursorPosition(Coordinates[0], Coordinates[1]);
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.Write('¤');
+                Console.ResetColor();
+            }
+        }
+        
         //Properties
         public int[] Coordinates
         {
@@ -59,10 +76,6 @@ namespace FinalProject
             }
             return true;
         }
-        public bool WithinMoveRange(Player player)
-        {
-            return CalculateDistanceToPlayer(player) <= 3 && CalculateDistanceToPlayer(player) > 1;
-        }
         //Passive Actions
         public void TakeDamage(int damage)
         {
@@ -74,53 +87,60 @@ namespace FinalProject
         }
         public void DealDamage(Player player)
         {
-            player.TakeDamage(_power);
+            //player.TakeDamage(_power);
+        }
+        public bool WithinMoveRange(Player player)
+        {
+            return CalculateDistanceToPlayer(player) <= MAXRANGE && CalculateDistanceToPlayer(player) >= 0;
         }
         public int CalculateDistanceToPlayer(Player player)
         {
-            int xDistance, yDistance;
-            xDistance = this.Coordinates[0] - player.Coordinates[0];
-            yDistance = this.Coordinates[1] - player.Coordinates[1];
-            if (xDistance == 1 || yDistance == 1) return 1;
-            if (xDistance > yDistance) return xDistance;
+            int xDistance = Math.Abs(this.Coordinates[0] - player.Coordinates[0]);
+            int yDistance = Math.Abs(this.Coordinates[1] - player.Coordinates[1]);
+            if (xDistance < yDistance) return xDistance;
             return yDistance;
-            //return xDistance + yDistance;
         }
-        public int CalculateDistanceToPlayer(Player player, int x, int y)
+        public int CalculateDistanceToPlayer(Player player, int dirX, int dirY)
         {
-            int xDistance, yDistance;
-            xDistance = Math.Abs(this.Coordinates[0] - player.Coordinates[0] + x);
-            yDistance = Math.Abs(this.Coordinates[1] - player.Coordinates[1] + y);
+            int xDistance = Math.Abs(this.Coordinates[0] - player.Coordinates[0] + dirX);
+            int yDistance = Math.Abs(this.Coordinates[1] - player.Coordinates[1] + dirY);
             return xDistance + yDistance;
         }
         //Actions
         public void Move(Player player)
         {
+            char dir;
+            int dirX = 0, dirY = 0;
             if (!WithinMoveRange(player)) return;
             int up = CalculateDistanceToPlayer(player, 0, -1);
             int right = CalculateDistanceToPlayer(player, 1, 0);
             int down = CalculateDistanceToPlayer(player, 0, 1);
             int left = CalculateDistanceToPlayer(player, -1, 0);
-            int yAxis = Math.Min(up, down);
-            int xAxis = Math.Min(right, left);
-            int finalDirection = Math.Min(xAxis, yAxis);
-        }
-        public void Move()
-        {
-            while (true)
+            int[] mins = { up, right, down, left };
+            int cardinal = Array.IndexOf(mins, mins.Min());
+            switch (cardinal)
             {
-                Console.SetCursorPosition(Coordinates[0], Coordinates[1]);
-                Console.Write(' ');
-                Coordinates[1] += 1;
-                Console.SetCursorPosition(Coordinates[0], Coordinates[1]);
-                Console.Write('¤');
-                Thread.Sleep(1000);
+                case 0: //up
+                    dirY = -1;
+                    break;
+                case 1: //right
+                    dirX = 1;
+                    break;
+                case 2: //down
+                    dirY = 1;
+                    break;
+                case 3: //left
+                    dirX = -1;
+                    break;
+                default:
+                    break;
             }
+            LockEnemyMoveCoordinates(dirX, dirY);
         }
-        public async void StartAsyncTask()
+        public async void StartAsyncTaskMoveEnemy(Player player)
         {
             // Start the task.
-            await Task.Run(() => Move());
+            await Task.Run(() => Move(player));
         }
     }
 }

@@ -2,7 +2,7 @@
 {
     internal struct Lightning
     {
-        readonly public int MPCost = 1;
+        readonly public int MPCost = 3;
         readonly public char Symbol = '╬';
         public int Charge = 2;
         readonly public int Range = 6;

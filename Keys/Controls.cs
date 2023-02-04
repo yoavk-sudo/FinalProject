@@ -31,7 +31,9 @@
                 "left a",
                 "interact e",
                 "fireball v",
-                "lightning m"
+                "heal u",
+                "lightning m",
+                "potion p"
             });
         }
         public static void NewControls()
@@ -55,8 +57,12 @@
                 Console.Clear();
                 Console.WriteLine("Enter a key for using fireball (default \'v\'):");
                 char fireball = char.Parse(Console.ReadLine());
-                Console.WriteLine("Enter a key for using lightning (default \'v\'):");
+                Console.WriteLine("Enter a key for using heal (default \'u\'):");
+                char heal = char.Parse(Console.ReadLine());
+                Console.WriteLine("Enter a key for using lightning (default \'m\'):");
                 char lightning = char.Parse(Console.ReadLine());
+                Console.WriteLine("Enter a key for using potion (default \'p\'):");
+                char potion = char.Parse(Console.ReadLine());
                 char[] inputs = { up, right, down, left, act, fireball };
                 if (inputs.Distinct().ToArray().Length != inputs.Length)
                 {
@@ -72,7 +78,9 @@
                     "left " + left,
                     "interact " + act,
                     "fireball " + fireball,
-                    "lightning " + lightning
+                    "heal " + heal,
+                    "lightning " + lightning,
+                    "potion " + potion
                 };
                 File.AppendAllLines(_customFile, lines);
                 KeyLayout.Clear();
