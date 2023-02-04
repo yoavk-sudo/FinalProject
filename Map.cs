@@ -40,6 +40,9 @@ namespace FinalProject
                         player.Coordinates[0] = Console.GetCursorPosition().Left;
                         player.Coordinates[1] = Console.GetCursorPosition().Top;
                         Console.ForegroundColor = ConsoleColor.Blue;
+                        Console.Write(Player.avatar);
+                        Console.ResetColor();
+                        continue;
                     }
                     if (!_bgElemnts.Contains(tile)) CharacterToLogic(tile);
                     else Console.Write(tile);
@@ -145,6 +148,7 @@ namespace FinalProject
                     Enemy en = Enemy.CreateEnemy();
                     en.Coordinates[0] = 1;
                     en.Coordinates[1] = 1;
+                    ele = Enemy.avatar;
                     //en.StartAsyncTask(player);
                     break;
                 case '¶': //key

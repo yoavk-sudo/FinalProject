@@ -4,6 +4,7 @@ namespace FinalProject
 {
     internal class Enemy
     {
+        public static char avatar = '¤';
         readonly string _type;
         readonly int _maxHP;
         int _currentHP;

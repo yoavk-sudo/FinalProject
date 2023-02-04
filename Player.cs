@@ -5,6 +5,7 @@ namespace FinalProject
 {
     internal class Player
     {
+        public static char avatar = '▲';
         int _maxHP = 20;
         int _maxMP = 10;
         int _manaRegen = 0;
@@ -251,19 +252,22 @@ namespace FinalProject
             switch (input)
             {
                 case 'w':
-                    input = '▲';
+                    input = avatar;// '▲';
                     Direction = "up";
                     break;
                 case 'd':
-                    input = '►';
+                    input = avatar; //'►';
+                    if(input == '▲') input = '►';
                     Direction = "right";
                     break;
                 case 's':
-                    input = '▼';
+                    input = avatar; //'▼';
+                    if(input == '▲') input = '▼';
                     Direction = "down";
                     break;
                 case 'a':
-                    input = '◄';
+                    input = avatar; //'◄';
+                    if(input == '▲') input = '◄';
                     Direction = "left";
                     break;
                 default:

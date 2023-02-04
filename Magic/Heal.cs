@@ -3,7 +3,7 @@
     internal struct Heal
     {
         readonly public int MPCost = 1;
-        readonly public char Symbol = '÷';
+        readonly public char Symbol = '+';
         public int Charge = 2;
         readonly public int Range = 0;
         readonly public static int Power = 3;
