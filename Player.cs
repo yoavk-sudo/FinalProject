@@ -50,9 +50,6 @@ namespace FinalProject
             Console.SetCursorPosition(Coordinates[0], Coordinates[1] - 1);
         }
 
-        Weapon weapon = new Weapon("nothing", 0);
-        Armor armor = new Armor("nothing", 0);
-        
         //constructor
         public Player(string name)
         {

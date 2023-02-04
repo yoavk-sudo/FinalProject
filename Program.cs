@@ -1,5 +1,4 @@
 ﻿using FinalProject.Menus;
-
 class Program
 {
     static void Main(string[] args)
