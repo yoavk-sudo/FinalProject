@@ -3,10 +3,6 @@
     internal class Inventory
     {
         static char[] items = {' ', ' ', ' ', ' ', ' '};
-        public Inventory()
-        {
-
-        }
         public static string[] InventoryDisplay()
         {
             int x = 5, y = Map.LowestTile + 3;

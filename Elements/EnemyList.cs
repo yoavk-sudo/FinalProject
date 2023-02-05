@@ -7,7 +7,7 @@
         {
             foreach (Enemy enemy in Enemies)
             {
-                if (enemy.Coordinates == cor) return enemy;
+                if (enemy.Coordinates.SequenceEqual(cor)) return enemy;
             }
             return null;
         }
@@ -17,6 +17,8 @@
         }
         static public void RemoveFromList(Enemy enemy)
         {
+            LockMethods.SetCursorLockAndOneSpace(enemy.Coordinates);
+            Map.ZeroCoordinate(Map.MapCol, enemy.Coordinates);
             Enemies.Remove(enemy);
         }
     }

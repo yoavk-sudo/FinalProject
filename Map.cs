@@ -12,7 +12,6 @@ namespace FinalProject
         static char[] _bgElemnts = { ' ', '|','-', '╔', '╚', '╗', '╝', '▲' };
         public static int[,] MapCol = CollisionMap(LevelPath);
         public static int LowestTile = File.ReadAllLines(LevelPath).GetLength(0);
-
         public static int LevelNumber
         {
             get { return _levelNum; }
@@ -28,9 +27,9 @@ namespace FinalProject
 
         public static async void PrintMap(Player player)
         {
-            HUD.DisplayHUD(player);
-            Spells.DisplaySpells();
-            string[] lines = File.ReadAllLines(LevelPath); 
+            PrintUI(player);
+            string[] lines = File.ReadAllLines(LevelPath);
+            Console.SetCursorPosition(0, 0);
             foreach (string line in lines)
             {
                 foreach (char tile in line)
@@ -50,24 +49,24 @@ namespace FinalProject
                 }
                 Console.WriteLine();
             }
-            Inventory.InventoryDisplay();
-            //Console.SetCursorPosition(player.Coordinates[0], player.Coordinates[1]);
             while (true)
             {
                 InputStream.Interperter(player);
             }
         }
-        public static async Task StartAsyncTimer(int interval)
+        private static void PrintUI(Player player)
         {
-            while (true)
+            HUD.DisplayHUD(player);
+            Spells.DisplaySpells();
+            Inventory.InventoryDisplay();
+            if (!Timer.IsTimerActive)
             {
-                Console.WriteLine("timer " + (300 - interval));
-                await Task.Delay(interval);
+                Timer.AsyncTimer();
+                Timer.IsTimerActive = true;
             }
         }
         public static int[,] CollisionMap(string levelName)
         {
-            //levelName = "Level_0" + 1 + ".txt";
             int maxLength = 0;
             int i = 0, j = 0;
             int height = File.ReadAllLines(levelName).GetLength(0);
@@ -96,6 +95,8 @@ namespace FinalProject
         {
             Console.Clear();
             UpdateLevelPath();
+            Log.PrintMessage("Entered floor " + LevelNumber + "...", ConsoleColor.DarkYellow);
+            Log.PrintControls();
             if (LevelPath != (Directory.GetCurrentDirectory() + "\\Shop.txt"))
             {
                 MapCol = CollisionMap(LevelPath);
@@ -122,10 +123,6 @@ namespace FinalProject
             }
             return -1;
         }
-        public static bool IsImportant(char ele)
-        {
-            return _bgElemnts.Contains(ele);
-        } //////
         public static void ZeroCoordinate(int[,] map, int[] cor)
         {
             if (cor == null) return; //Object doesn't exist in element dictionary, therefore cor is null
@@ -146,8 +143,8 @@ namespace FinalProject
                 case '¤': //enemy
                     Console.ForegroundColor = ConsoleColor.Red;
                     Enemy en = Enemy.CreateEnemy();
-                    en.Coordinates[0] = 1;
-                    en.Coordinates[1] = 1;
+                    en.Coordinates[0] = Console.CursorLeft;
+                    en.Coordinates[1] = Console.CursorTop;
                     ele = Enemy.avatar;
                     //en.StartAsyncTask(player);
                     break;

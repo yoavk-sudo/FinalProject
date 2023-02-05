@@ -10,10 +10,10 @@ namespace FinalProject
         int _maxMP = 10;
         int _manaRegen = 0;
         int _manaCounter = 5;
-        private int _counter = 0;
+        public int ExpLvlCap = 10;
         const int TRAPDAMAGE = 1;
         const int MAXGOLD = 9999;
-        Weapon weapon = new Weapon("nothing", 0);
+        Weapon weapon = new Weapon("nothing", 1);
         Armor armor = new Armor("nothing", 0);
         public Player(string name)
         {
@@ -51,12 +51,13 @@ namespace FinalProject
                 magicCoor[1] = Coordinates[1];
                 magicCoor[0] += XY[0];
                 magicCoor[1] += XY[1];
+                MP -= Spells.spells[spell].MPCost;
+                HUD.DisplayHUD(this);
+                if (spell == Spells.FindSpell(typeof(Heal))) return magicCoor;
                 Console.SetCursorPosition(magicCoor[0], magicCoor[1]);
                 Console.ForegroundColor = Spells.spells[spell].Col;
                 Console.Write(Spells.spells[spell].Symbol);
                 Console.ResetColor();
-                this.MP -= Spells.spells[spell].MPCost;
-                HUD.DisplayHUD(this);
                 return magicCoor;
             }
         }
@@ -104,10 +105,10 @@ namespace FinalProject
         {
             get { return weapon.weaponDamage; }
         }
-        public int Experience
+        public double Experience
         {
             get; set;
-        }
+        } = 9.5;
         public int Level
         {
             get; set;
@@ -161,9 +162,10 @@ namespace FinalProject
             int total = damage - armor.ArmorDef;
             if (total >= 0)//if shield>damage do nothing
             {
+                if (_isTrap) total = damage;
                 HP = HP - total;
                 if (HP <= 0) HP = 0;
-                Log.PrintMessage($"You took {total} damage!" , ConsoleColor.Red);
+                Log.PrintMessage($"You took {total} damage! HP is {HP}" , ConsoleColor.Red);
                 HUD.DisplayHUD(this);
                 return;
             }
@@ -203,6 +205,28 @@ namespace FinalProject
             if (Gold > MAXGOLD) Gold = MAXGOLD;
             HUD.DisplayHUD(this);
         }
+        public void GainEXP(int expAmount)
+        {
+            Experience+= expAmount;
+            HUD.DisplayHUD(this);
+            if (Experience < ExpLvlCap)
+            {
+                Log.PrintMessage($"Got {expAmount} EXP!", ConsoleColor.Green);
+                return;
+            }
+            LevelUp();
+        }
+        public void LevelUp()
+        {
+            Log.PrintMessage("You have leveled up! Your level is: " + ++Level, ConsoleColor.Green);
+            _maxHP += 10;
+            _maxMP += 5;
+            HP = _maxHP;
+            MP= _maxMP;
+            ExpLvlCap = Level * 10;
+            Experience = 0;
+            HUD.DisplayHUD(this);
+        }
         #endregion
         #region Player actions
         public async Task CastSpell(char input)
@@ -238,13 +262,13 @@ namespace FinalProject
             }
             if (isHeal) this.Heal(Magic.Heal.Power);
             int[] XY = DirectionToXY();
-            if (Map.WhatIsInNextTile(Coordinates, XY) == 1) return; //if obstructed
+            if (Map.WhatIsInNextTile(Coordinates, XY) == 1 && !isHeal) return; //if obstructed
             Spells.ClearSpellSlate();
             Console.Beep(150, 100);
             Spells.spells[spell].Charge = 0;
-            if (isHeal) return;
             int[] magicCoor = GetCoordinates(XY, spell);
             Spells.DisplaySpells();
+            if (isHeal) return;
             Task<int> t = await Task.Run(() => Spells.MoveSpell(Spells.spells[spell], magicCoor, Direction));
         }
         private async Task MoveCollision(char input)
@@ -324,6 +348,20 @@ namespace FinalProject
         void DealDamage(int[] cor, int dmg)
         {
             if(EnemyList.EnemyByCoordinates(cor) == null) return;
+            int critChance = Random.Shared.Next(1, 11);
+            int hitChance = Random.Shared.Next(1, 11);
+            if (hitChance < 2)
+            {
+                Log.PrintMessage("Enemy dodged your attack!", ConsoleColor.Red);
+                return;
+            }
+            if (critChance < 2)
+            {
+                dmg *= 2;
+                Log.PrintMessage("CRIT", ConsoleColor.DarkYellow);
+            }
+            EnemyList.EnemyByCoordinates(cor).TakeDamage(dmg);
+            Log.PrintMessage($"You dealt {dmg} damage!", ConsoleColor.Green);
         }
         public void UsePotion()
         {

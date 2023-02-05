@@ -9,11 +9,11 @@ namespace FinalProject
         readonly int _maxHP;
         int _currentHP;
         readonly int _power;
-        int _diff; // 0 or 1 = easy or hard
+        public static int Diff = 1;
         readonly int _gold;
         int _exp;
         const int MAXRANGE = 5;
-        static List<Enemy> enemies = new List<Enemy>();
+        static List<Enemy> enemies = new List<Enemy>(); ////////////////
         //Constructor
         public Enemy(string type, int maxHP, int power)
         {
@@ -28,8 +28,8 @@ namespace FinalProject
         public static Enemy CreateEnemy() ///////////////////////////////////////////
         {
             string eType = "1";
-            int hp = 1;
-            int pow = 1;
+            int hp = Map.LevelNumber;
+            int pow = Map.LevelNumber * Diff;
             Enemy enemy = new Enemy(eType, hp, pow);
             return enemy;
         }
@@ -59,14 +59,14 @@ namespace FinalProject
             get { return _currentHP; }
             set { _currentHP = value; }
         }
-        public int EXP { get { return _exp; } set { _exp = value; } }
+        public int EXP { get { return _exp * Diff; } set { _exp = value; } }
         //Passive qualities
         private int GoldAmount(int power)
         {
             int min = power * 2;
             int max = power * 3;
-            int amount = Random.Shared.Next(min, max);
-            return amount;
+            int amount = Random.Shared.Next(min, max + 1);
+            return amount * 10 * (1 / Diff);
         }
         public bool IsAlive()
         {
@@ -84,6 +84,7 @@ namespace FinalProject
             if (HP < 0)
             {
                 HP = 0;
+                EnemyList.RemoveFromList(this);
             }
         }
         public void DealDamage(Player player)

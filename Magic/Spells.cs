@@ -115,7 +115,7 @@
                         break;
                 }
                 int[] XY = { x, y };
-                if (Map.WhatIsInNextTile(coordinates, XY) == 1) return -1;
+                if (Map.WhatIsInNextTile(coordinates, XY) != 0) return -1;
                 SetCursorLockAndDrawSpell(spell, coordinates, x, y);
                 Thread.Sleep(spd);
             }

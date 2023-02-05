@@ -57,10 +57,13 @@
                 Console.Clear();
                 Console.WriteLine("Enter a key for using fireball (default \'v\'):");
                 char fireball = char.Parse(Console.ReadLine());
+                Console.Clear();
                 Console.WriteLine("Enter a key for using heal (default \'u\'):");
                 char heal = char.Parse(Console.ReadLine());
+                Console.Clear();
                 Console.WriteLine("Enter a key for using lightning (default \'m\'):");
                 char lightning = char.Parse(Console.ReadLine());
+                Console.Clear();
                 Console.WriteLine("Enter a key for using potion (default \'p\'):");
                 char potion = char.Parse(Console.ReadLine());
                 char[] inputs = { up, right, down, left, act, fireball };
@@ -85,7 +88,7 @@
                 File.AppendAllLines(_customFile, lines);
                 KeyLayout.Clear();
                 Console.Clear();
-                Setup();
+                //Setup();
             }
             catch (FormatException ex)
             {
