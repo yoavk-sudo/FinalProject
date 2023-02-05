@@ -2,6 +2,7 @@
 using FinalProject.Keys;
 using FinalProject.Magic;
 using System.Diagnostics;
+using System.Drawing.Imaging;
 
 namespace FinalProject
 {
@@ -12,6 +13,7 @@ namespace FinalProject
         static char[] _bgElemnts = { ' ', '|','-', '╔', '╚', '╗', '╝', '▲' };
         public static int[,] MapCol = CollisionMap(LevelPath);
         public static int LowestTile = File.ReadAllLines(LevelPath).GetLength(0);
+        public static bool IsAlive = true;
         public static int LevelNumber
         {
             get { return _levelNum; }
@@ -49,7 +51,7 @@ namespace FinalProject
                 }
                 Console.WriteLine();
             }
-            while (true)
+            while (IsAlive)
             {
                 InputStream.Interperter(player);
             }
@@ -95,6 +97,7 @@ namespace FinalProject
         {
             Console.Clear();
             UpdateLevelPath();
+            ElementsList.RemoveAllElements();
             Log.PrintMessage("Entered floor " + LevelNumber + "...", ConsoleColor.DarkYellow);
             Log.PrintControls();
             if (LevelPath != (Directory.GetCurrentDirectory() + "\\Shop.txt"))
@@ -140,13 +143,18 @@ namespace FinalProject
         {
             switch (ele)
             {
-                case '¤': //enemy
+                case 'ð': //enemy
                     Console.ForegroundColor = ConsoleColor.Red;
                     Enemy en = Enemy.CreateEnemy();
                     en.Coordinates[0] = Console.CursorLeft;
                     en.Coordinates[1] = Console.CursorTop;
+                    break;
+                case '¤': //enemy
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    en = Enemy.CreateEnemy();
+                    en.Coordinates[0] = Console.CursorLeft;
+                    en.Coordinates[1] = Console.CursorTop;
                     ele = Enemy.avatar;
-                    //en.StartAsyncTask(player);
                     break;
                 case '¶': //key
                     Console.ForegroundColor = ConsoleColor.Cyan;

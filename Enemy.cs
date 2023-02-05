@@ -13,16 +13,15 @@ namespace FinalProject
         readonly int _gold;
         int _exp;
         const int MAXRANGE = 5;
-        static List<Enemy> enemies = new List<Enemy>(); ////////////////
         //Constructor
         public Enemy(string type, int maxHP, int power)
         {
-            enemies.Add(this);
             _type = type;
             _maxHP = maxHP;
             _currentHP = _maxHP;
             _power = power;
             _gold = GoldAmount(power);
+            _exp = Map.LevelNumber * 2;
             EnemyList.AddToList(this);
         }
         public static Enemy CreateEnemy() ///////////////////////////////////////////
@@ -72,18 +71,20 @@ namespace FinalProject
         {
             if (this.HP <= 0)
             {
-                enemies.Remove(this);
+                EnemyList.RemoveFromList(this);
                 return false;
             }
             return true;
         }
         //Passive Actions
-        public void TakeDamage(int damage)
+        public void TakeDamage(int damage, Player player)
         {
             HP -= damage;
             if (HP < 0)
             {
                 HP = 0;
+                player.GetGold(_gold);
+                player.GainEXP(_exp);
                 EnemyList.RemoveFromList(this);
             }
         }

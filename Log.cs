@@ -1,4 +1,5 @@
 ﻿using FinalProject.Keys;
+using FinalProject.Magic;
 
 namespace FinalProject
 {
@@ -48,6 +49,9 @@ namespace FinalProject
             _controls.Add($"{Controls.KeyLayout["interact"]}: interact", 6);
             _controls.Add("   or hit enemies", 7);
             _controls.Add($"{Controls.KeyLayout["potion"]}: use potion", 8);
+            _controls.Add($"{Controls.KeyLayout["fireball"]}: fireball", 9);
+            _controls.Add($"{Controls.KeyLayout["heal"]}: heal", 10);
+            _controls.Add($"{Controls.KeyLayout["lightning"]}: lightning", 11);
             PrintControls();
             PrintMessage("Entered floor 1...", ConsoleColor.DarkYellow);
         }
@@ -58,6 +62,9 @@ namespace FinalProject
                 foreach (var item in _controls)
                 {
                     Console.SetCursorPosition(STARTPOS - 20, item.Value);
+                    if (item.Value == 9 && Spells.spells[0].IsAcquired == false) continue;
+                    if (item.Value == 10 && Spells.spells[2].IsAcquired == false) continue;
+                    if (item.Value == 11 && Spells.spells[1].IsAcquired == false) continue;
                     Console.Write(item.Key);
                     Console.SetCursorPosition(STARTPOS - 2, item.Value);
                     Console.Write("¦");

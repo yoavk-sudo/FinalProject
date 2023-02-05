@@ -1,4 +1,6 @@
-﻿namespace FinalProject.Magic
+﻿using FinalProject.Elements;
+
+namespace FinalProject.Magic
 {
     internal static class Spells
     {
@@ -6,7 +8,7 @@
         static Lightning lightning = new();
         static Heal heal = new();
         static int x = 5, y = 17;
-        readonly public static dynamic[] spells = new dynamic[] { fire , lightning, heal};
+        readonly public static dynamic[] spells = new dynamic[] { fire , heal, lightning };
         private static void SetCursorZeros()
         {
             Console.SetCursorPosition(0, 0);
@@ -38,6 +40,7 @@
             x = 5; y = 17;
             foreach (var spell in spells)
             {
+                if(!spell.IsAcquired) continue;
                 SetCursorLockAndAction(spell);
                 x += 5;
                 Console.ResetColor();
@@ -89,7 +92,7 @@
         {
             SetCursorLockAndClearSlate();
         }
-        public static async Task<int> MoveSpell(dynamic spell, int[] coordinates, string direction)
+        public static async Task<int> MoveSpell(dynamic spell, int[] coordinates, string direction, Player player)
         {   
             int x = 0, y = 0;
             int spd = (int)Math.Round(1000 * spell.Speed);
@@ -115,6 +118,8 @@
                         break;
                 }
                 int[] XY = { x, y };
+                int[] inFront = { coordinates[0] + x, coordinates[1] + y };
+                if (EnemyList.EnemyByCoordinates(inFront) != null) player.DealDamage(inFront, spell.Power); ;
                 if (Map.WhatIsInNextTile(coordinates, XY) != 0) return -1;
                 SetCursorLockAndDrawSpell(spell, coordinates, x, y);
                 Thread.Sleep(spd);

@@ -1,5 +1,7 @@
 ﻿using FinalProject.Elements;
+using FinalProject.Keys;
 using FinalProject.Magic;
+using FinalProject.Menus;
 
 namespace FinalProject
 {
@@ -7,7 +9,7 @@ namespace FinalProject
     {
         public static char avatar = '▲';
         int _maxHP = 20;
-        int _maxMP = 10;
+        int _maxMP = 5;
         int _manaRegen = 0;
         int _manaCounter = 5;
         public int ExpLvlCap = 10;
@@ -18,9 +20,19 @@ namespace FinalProject
         public Player(string name)
         {
             this.PlayerName = name;
+            NewPlayerStatsReset();
+            Console.CursorVisible = false;
+        }
+
+        private void NewPlayerStatsReset()
+        {
+            _maxHP = 20;
+            _maxMP = 5;
+            Level = 1;
+            ExpLvlCap = 10;
+            Experience = 9.5;
             this.HP = _maxHP;
             this.MP = _maxMP;
-            Console.CursorVisible = false;
         }
 
         #region LockAsyncSetCursor
@@ -69,7 +81,6 @@ namespace FinalProject
                 Console.ForegroundColor = ConsoleColor.Blue;
                 Console.Write(avatar); //print player at new coordinates
                 Console.ResetColor();
-                //Console.SetCursorPosition(0, 20);
             }
         }
         private void TrySetCursorInRange()
@@ -156,21 +167,30 @@ namespace FinalProject
             float rand = new Random().Next(1, 11);
             if (rand <= this.Evasion && !_isTrap)
             {
-                Log.PrintMessage("You evaded an attack!", ConsoleColor.White);
+                Log.PrintMessage("You evaded an attack!", ConsoleColor.Cyan);
                 return;
             }
             int total = damage - armor.ArmorDef;
-            if (total >= 0)//if shield>damage do nothing
+            if (total > 0)//if shield>damage do nothing
             {
                 if (_isTrap) total = damage;
                 HP = HP - total;
                 if (HP <= 0) HP = 0;
                 Log.PrintMessage($"You took {total} damage! HP is {HP}" , ConsoleColor.Red);
                 HUD.DisplayHUD(this);
+                if (HP == 0) Loss();
                 return;
             }
             Log.PrintMessage($"You blocked that attack!", ConsoleColor.Blue);
         }
+
+        private void Loss()
+        {
+            if (IsAlive()) return;
+            Thread.Sleep(500);
+            GameOver.GameOverDisplay(this);
+        }
+
         public void Heal(int healAmount)
         {
             if(HP == _maxHP) return;
@@ -188,8 +208,9 @@ namespace FinalProject
         }
         public bool IsAlive()
         {
-            if(this.HP <= 0) return false;
-            return true;
+            if (HP > 0) return true;
+            Map.IsAlive = false;
+            return false;
         }
         private void MPRegen()
         {
@@ -226,6 +247,24 @@ namespace FinalProject
             ExpLvlCap = Level * 10;
             Experience = 0;
             HUD.DisplayHUD(this);
+            if (Level == 2)
+            {
+                Spells.spells[0].IsAcquired = true;
+                Log.PrintMessage($"Learned Fireball! Press {Controls.KeyLayout["fireball"]} to launch a fireball", ConsoleColor.DarkGreen);
+                Spells.DisplaySpells();
+            }
+            if (Level == 4)
+            {
+                Spells.spells[2].IsAcquired = true;
+                Log.PrintMessage($"Learned Heal! Press {Controls.KeyLayout["heal"]} to heal", ConsoleColor.DarkGreen);
+                Spells.DisplaySpells();
+            }
+            if (Level == 6)
+            {
+                Spells.spells[1].IsAcquired = true;
+                Log.PrintMessage($"Learned Lightning! Press {Controls.KeyLayout["Lightning"]} to bring down a lightning bolt", ConsoleColor.DarkGreen);
+                Spells.DisplaySpells();
+            }
         }
         #endregion
         #region Player actions
@@ -249,6 +288,7 @@ namespace FinalProject
                     return;
             }
             if (spell == -1) return;
+            if (!Spells.spells[spell].IsAcquired) return;
             if (Spells.spells[spell].Charge != 2)
             {
                 //beep error
@@ -269,7 +309,7 @@ namespace FinalProject
             int[] magicCoor = GetCoordinates(XY, spell);
             Spells.DisplaySpells();
             if (isHeal) return;
-            Task<int> t = await Task.Run(() => Spells.MoveSpell(Spells.spells[spell], magicCoor, Direction));
+            Task<int> t = await Task.Run(() => Spells.MoveSpell(Spells.spells[spell], magicCoor, Direction, this));
         }
         private async Task MoveCollision(char input)
         {
@@ -345,7 +385,7 @@ namespace FinalProject
             if (EnemyList.EnemyByCoordinates(inFront) != null) DealDamage(inFront, Damage); //basic attack
             ElementsList.InteractWithElement(inFront, this);
         }
-        void DealDamage(int[] cor, int dmg)
+        public void DealDamage(int[] cor, int dmg)
         {
             if(EnemyList.EnemyByCoordinates(cor) == null) return;
             int critChance = Random.Shared.Next(1, 11);
@@ -358,10 +398,13 @@ namespace FinalProject
             if (critChance < 2)
             {
                 dmg *= 2;
+                Log.PrintMessage($"You dealt {dmg} damage!", ConsoleColor.Green);
                 Log.PrintMessage("CRIT", ConsoleColor.DarkYellow);
+                EnemyList.EnemyByCoordinates(cor).TakeDamage(dmg, this);
+                return;
             }
-            EnemyList.EnemyByCoordinates(cor).TakeDamage(dmg);
             Log.PrintMessage($"You dealt {dmg} damage!", ConsoleColor.Green);
+            EnemyList.EnemyByCoordinates(cor).TakeDamage(dmg, this);
         }
         public void UsePotion()
         {

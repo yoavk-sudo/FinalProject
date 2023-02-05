@@ -19,7 +19,15 @@
         {
             LockMethods.SetCursorLockAndOneSpace(enemy.Coordinates);
             Map.ZeroCoordinate(Map.MapCol, enemy.Coordinates);
+            enemy.HP = 0;
             Enemies.Remove(enemy);
+        }
+        public static void TerminateAllEnemies()
+        {
+            foreach (var enemy in Enemies)
+            {
+                RemoveFromList(enemy);
+            }
         }
     }
 }

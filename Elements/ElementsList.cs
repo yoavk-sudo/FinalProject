@@ -38,19 +38,23 @@ namespace FinalProject.Elements
             }
             return ' ';
         }
-        static public char ElementByCoordinates(int[] cor)
+        public static char ElementByCoordinates(int[] cor)
         {
             if (!ContainsCoordinates(cor)) return ' ';//return ' ';
             return GetKeyByValue(cor);
         }
-        static public void AddToList(char element)
+        public static void AddToList(char element)
         {
             int[] cor = { Console.GetCursorPosition().Left, Console.GetCursorPosition().Top };
             ElementList.Add(element, cor);
         }
-        static public void RemoveFromList(char element)
+        public static void RemoveFromList(char element)
         {
             ElementList.Remove(element);
+        }
+        public static void RemoveAllElements()
+        {
+            ElementList.Clear();
         }
         static void RemoveFromWorld(char element)
         {
