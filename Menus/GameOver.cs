@@ -5,10 +5,12 @@
         static public void GameOverDisplay(Player? player)
         {
             player = null;
+            Map.MapCol = null;
             Console.Clear();
+            if (File.Exists(MainMenu.Path + "\\Saves.txt")) File.Delete(MainMenu.Path + "\\Saves.txt");
             Console.SetCursorPosition(52, 2);
             Console.ForegroundColor = ConsoleColor.DarkGray;
-            Console.WriteLine("Game Over");
+            Console.WriteLine("You Died");
             Console.SetCursorPosition(50, 3);
             Console.WriteLine("************");
             Console.ResetColor();

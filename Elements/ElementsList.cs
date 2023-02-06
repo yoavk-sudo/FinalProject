@@ -85,6 +85,9 @@ namespace FinalProject.Elements
                     //Play SFX?
                     break;
                 case '¡': //wand
+                    RemoveFromWorld(element);
+                    Inventory.AddToInventory('¡');//Add to inventory
+                    Log.PrintMessage("Got a simple wand!", ConsoleColor.Green); 
                     break;
                 case '#': //trap
                     Log.PrintMessage("You screamed in pain as a row of spikes pierce your feet", ConsoleColor.Red);
@@ -99,6 +102,10 @@ namespace FinalProject.Elements
                     Inventory.AddToInventory('ß');//Add to inventory
                     Log.PrintMessage("Got an HP potion!", ConsoleColor.Green);
                     break;
+                case 'Â':
+                    RemoveFromWorld(element);
+                    Inventory.AddToInventory('Â');//Add to inventory
+                    Log.PrintMessage("Got a cape! Got 2 additional defense", ConsoleColor.Green); break;
                 default:
                     break;
             }

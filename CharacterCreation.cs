@@ -19,8 +19,9 @@ namespace FinalProject
                 MainMenu.DisplayMainMenu();
                 return null;
             }    
+            Map.MapCol = Map.CollisionMap(MainMenu.Path + "\\Level_01.txt");
             Player player = new(name);
-            Save.SaveGame(player);
+            //Save.SaveGame(player);
             Console.Clear();
             Controls.Setup();
             Log.SetControlsDictionary();

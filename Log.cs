@@ -63,8 +63,8 @@ namespace FinalProject
                 {
                     Console.SetCursorPosition(STARTPOS - 20, item.Value);
                     if (item.Value == 9 && Spells.spells[0].IsAcquired == false) continue;
-                    if (item.Value == 10 && Spells.spells[2].IsAcquired == false) continue;
-                    if (item.Value == 11 && Spells.spells[1].IsAcquired == false) continue;
+                    if (item.Value == 10 && Spells.spells[1].IsAcquired == false) continue;
+                    if (item.Value == 11 && Spells.spells[2].IsAcquired == false) continue;
                     Console.Write(item.Key);
                     Console.SetCursorPosition(STARTPOS - 2, item.Value);
                     Console.Write("¦");

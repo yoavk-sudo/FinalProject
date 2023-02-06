@@ -1,15 +1,14 @@
 ﻿using FinalProject.Elements;
 using FinalProject.Keys;
 using FinalProject.Magic;
-using System.Diagnostics;
-using System.Drawing.Imaging;
+using FinalProject.Menus;
 
 namespace FinalProject
 {
     internal static class Map
     {
         static int _levelNum = 1;
-        static string LevelPath = Directory.GetCurrentDirectory() + "\\Level_0" + _levelNum + ".txt";
+        static string LevelPath = MainMenu.Path + "\\Level_0" + _levelNum + ".txt";
         static char[] _bgElemnts = { ' ', '|','-', '╔', '╚', '╗', '╝', '▲' };
         public static int[,] MapCol = CollisionMap(LevelPath);
         public static int LowestTile = File.ReadAllLines(LevelPath).GetLength(0);
@@ -98,6 +97,7 @@ namespace FinalProject
             Console.Clear();
             UpdateLevelPath();
             ElementsList.RemoveAllElements();
+            LowestTile = File.ReadAllLines(LevelPath).GetLength(0);
             Log.PrintMessage("Entered floor " + LevelNumber + "...", ConsoleColor.DarkYellow);
             Log.PrintControls();
             if (LevelPath != (Directory.GetCurrentDirectory() + "\\Shop.txt"))
@@ -106,7 +106,6 @@ namespace FinalProject
                 PrintMap(player);
             }
             else ShopLevel();
-            LowestTile = File.ReadAllLines(LevelPath).GetLength(0);
         }
 
         private static void ShopLevel()
@@ -185,6 +184,10 @@ namespace FinalProject
                     break;
                 case 'ß': //HP Potion
                     Console.ForegroundColor = ConsoleColor.Green;
+                    ElementsList.AddToList(ele);
+                    break;
+                case 'Â': //Armor
+                    Console.ForegroundColor = ConsoleColor.Cyan;
                     ElementsList.AddToList(ele);
                     break;
             }

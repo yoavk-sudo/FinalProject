@@ -255,13 +255,13 @@ namespace FinalProject
             }
             if (Level == 4)
             {
-                Spells.spells[2].IsAcquired = true;
+                Spells.spells[1].IsAcquired = true;
                 Log.PrintMessage($"Learned Heal! Press {Controls.KeyLayout["heal"]} to heal", ConsoleColor.DarkGreen);
                 Spells.DisplaySpells();
             }
             if (Level == 6)
             {
-                Spells.spells[1].IsAcquired = true;
+                Spells.spells[2].IsAcquired = true;
                 Log.PrintMessage($"Learned Lightning! Press {Controls.KeyLayout["Lightning"]} to bring down a lightning bolt", ConsoleColor.DarkGreen);
                 Spells.DisplaySpells();
             }

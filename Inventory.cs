@@ -2,11 +2,11 @@
 {
     internal class Inventory
     {
-        static char[] items = {' ', ' ', ' ', ' ', ' '};
+        static char[] items = {' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '};
         public static string[] InventoryDisplay()
         {
             int x = 5, y = Map.LowestTile + 3;
-            int size = 5;
+            int size = items.Length;
             string[] slots = new string[size];
             for (int i = 0; i < size; i++)
             {
@@ -16,6 +16,8 @@
                     Console.Write("---");
                     Console.SetCursorPosition(x - 1, y + 1);
                     Console.Write("| ");
+                    if (items[i] == '¡') Console.ForegroundColor = ConsoleColor.Cyan;
+                    if (items[i] == 'Â') Console.ForegroundColor = ConsoleColor.Cyan;
                     if (items[i] == 'ß') Console.ForegroundColor = ConsoleColor.Green;
                     Console.Write(items[i]);
                     Console.ResetColor();
@@ -25,6 +27,11 @@
                     Console.SetCursorPosition(x + 2, y);
                     x += 6;
                 }
+                if (i == 3)
+                {
+                    y += 4;
+                    x -= 24;
+                }
             }
             return slots;
         }
@@ -33,7 +40,15 @@
             switch (item)
             {
                 case 'ß': //HP Potion
-                    items[4] = 'ß';
+                    items[7] = 'ß';
+                    InventoryDisplay();
+                    break;
+                case '¡': //wand
+                    items[4] = '¡';
+                    InventoryDisplay();
+                    break;
+                case 'Â': //armor
+                    items[5] = 'Â';
                     InventoryDisplay();
                     break;
                 default:

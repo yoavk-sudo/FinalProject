@@ -4,6 +4,7 @@ namespace FinalProject.Menus
 {
     internal static class MainMenu
     {
+        public static string Path = Directory.GetCurrentDirectory();
         static private bool _save = true;
         const int STARTIGNPOS = 55;
         const int LOGOPOS = 50;
@@ -21,7 +22,7 @@ namespace FinalProject.Menus
             Console.WriteLine();
             Console.SetCursorPosition(STARTIGNPOS, 8);
             Console.WriteLine("1. New Game");
-            if (!File.Exists("Saves.txt"))
+            if (!File.Exists(Path + "\\Saves.txt"))
             {
                 _save = false;
                 Console.ForegroundColor = ConsoleColor.DarkGray;
