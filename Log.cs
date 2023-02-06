@@ -54,6 +54,7 @@ namespace FinalProject
             _controls.Add($"{Controls.KeyLayout["lightning"]}: lightning", 11);
             PrintControls();
             PrintMessage("Entered floor 1...", ConsoleColor.DarkYellow);
+            Console.ResetColor();
         }
         public static void PrintControls()
         {
@@ -69,6 +70,17 @@ namespace FinalProject
                     Console.SetCursorPosition(STARTPOS - 2, item.Value);
                     Console.Write("¦");
                 }
+            }
+        }
+        public static void ClearControlsLayout()
+        {
+            _controls.Clear();
+        }
+        public static void ClearLog()
+        {
+            for (int i = 0; i < logList.Length; i++)
+            {
+                logList[i] = "";
             }
         }
     }

@@ -1,4 +1,6 @@
-﻿using System.Linq;
+﻿using FinalProject.Keys;
+using FinalProject.Magic;
+using System.Linq;
 
 namespace FinalProject.Elements
 {
@@ -76,7 +78,7 @@ namespace FinalProject.Elements
                     break;
                 case '╩': //lever
                     RemoveFromWorld(element);
-                    LockWriteElementAtCoordinates('╦', cor, ConsoleColor.DarkMagenta);
+                    LockWriteElementAtCoordinates('╦', cor, ConsoleColor.Magenta);
                     cor = ElementList.FirstOrDefault(x => x.Key == '±').Value;
                     LockMethods.SetCursorLockAndOneSpace(cor);
                     RemoveFromWorld('±');
@@ -87,7 +89,10 @@ namespace FinalProject.Elements
                 case '¡': //wand
                     RemoveFromWorld(element);
                     Inventory.AddToInventory('¡');//Add to inventory
-                    Log.PrintMessage("Got a simple wand!", ConsoleColor.Green); 
+                    player.Weapon.weaponName = "Simple_Wand";
+                    player.Weapon.weaponDamage = 1;
+                    Log.PrintMessage("Got a simple wand!", ConsoleColor.Green);
+                    HUD.DisplayHUD(player);
                     break;
                 case '#': //trap
                     Log.PrintMessage("You screamed in pain as a row of spikes pierce your feet", ConsoleColor.Red);
@@ -105,7 +110,17 @@ namespace FinalProject.Elements
                 case 'Â':
                     RemoveFromWorld(element);
                     Inventory.AddToInventory('Â');//Add to inventory
-                    Log.PrintMessage("Got a cape! Got 2 additional defense", ConsoleColor.Green); break;
+                    player.Armor.ArmorName = "Simple_Cape";
+                    player.Armor.ArmorDef = 2;
+                    Log.PrintMessage("Got a cape! Got 2 additional defense", ConsoleColor.Green);
+                    HUD.DisplayHUD(player);
+                    break;
+                case '§':
+                    RemoveFromWorld(element);
+                    Spells.spells[3].IsAcquired = true;
+                    Log.PrintMessage($"Got Teleport spell! Press {Controls.KeyLayout["teleport"]} to teleport", ConsoleColor.DarkGreen);
+                    Inventory.AddToInventory('§');
+                    break;
                 default:
                     break;
             }

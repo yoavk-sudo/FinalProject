@@ -1,22 +1,24 @@
 ﻿using FinalProject.Elements;
 using FinalProject.Keys;
-using FinalProject.Magic;
 using FinalProject.Menus;
 
 namespace FinalProject
 {
     internal static class Map
     {
-        static int _levelNum = 1;
-        static string LevelPath = MainMenu.Path + "\\Level_0" + _levelNum + ".txt";
+        static int _lvlNum = 1;
+        static string LevelPath = MainMenu.Path + "\\Level_0" + LevelNumber + ".txt";
+        public static int LevelNumber {
+            get { return _lvlNum; }
+            set {
+                _lvlNum = value;
+                LevelPath = MainMenu.Path + "\\Level_0" + _lvlNum + ".txt";
+            } 
+        }
         static char[] _bgElemnts = { ' ', '|','-', '╔', '╚', '╗', '╝', '▲' };
         public static int[,] MapCol = CollisionMap(LevelPath);
         public static int LowestTile = File.ReadAllLines(LevelPath).GetLength(0);
         public static bool IsAlive = true;
-        public static int LevelNumber
-        {
-            get { return _levelNum; }
-        }
 
         /*
          * Create 2 maps, 1 visible, the second is a 2 dimensional array
@@ -40,7 +42,7 @@ namespace FinalProject
                         player.Coordinates[0] = Console.GetCursorPosition().Left;
                         player.Coordinates[1] = Console.GetCursorPosition().Top;
                         Console.ForegroundColor = ConsoleColor.Blue;
-                        Console.Write(Player.avatar);
+                        Console.Write(Player.Avatar);
                         Console.ResetColor();
                         continue;
                     }
@@ -54,11 +56,12 @@ namespace FinalProject
             {
                 InputStream.Interperter(player);
             }
+            LevelNumber = 1;
+            GameOver.GameOverDisplay(player);
         }
         private static void PrintUI(Player player)
         {
             HUD.DisplayHUD(player);
-            Spells.DisplaySpells();
             Inventory.InventoryDisplay();
             if (!Timer.IsTimerActive)
             {
@@ -138,22 +141,32 @@ namespace FinalProject
         {
             map[cor[0], cor[1]] = 2;
         }
+        public static void ClearCollisionMap()
+        {
+            for (int i = 0; i < MapCol.GetLength(0); i++)
+            {
+                for (int j = 0; j < MapCol.GetLength(1); j++)
+                {
+                    ZeroCoordinate(MapCol, new int[] { i, j });
+                }
+            }
+        }
         private static void CharacterToLogic(char ele)
         {
             switch (ele)
             {
                 case 'ð': //enemy
                     Console.ForegroundColor = ConsoleColor.Red;
-                    Enemy en = Enemy.CreateEnemy();
+                    Enemy en = Enemy.CreateEnemy("troll");
                     en.Coordinates[0] = Console.CursorLeft;
                     en.Coordinates[1] = Console.CursorTop;
                     break;
                 case '¤': //enemy
                     Console.ForegroundColor = ConsoleColor.Red;
-                    en = Enemy.CreateEnemy();
+                    en = Enemy.CreateEnemy("bat");
                     en.Coordinates[0] = Console.CursorLeft;
                     en.Coordinates[1] = Console.CursorTop;
-                    ele = Enemy.avatar;
+                    ele = Enemy.Avatar;
                     break;
                 case '¶': //key
                     Console.ForegroundColor = ConsoleColor.Cyan;
@@ -196,8 +209,8 @@ namespace FinalProject
         }
         private static void UpdateLevelPath()
         {
-            _levelNum++;
-            LevelPath = "Level_0" + _levelNum + ".txt";
+            _lvlNum++;
+            LevelPath = "Level_0" + LevelNumber + ".txt";
         }
     }
 }

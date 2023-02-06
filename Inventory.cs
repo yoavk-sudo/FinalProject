@@ -1,4 +1,6 @@
-﻿namespace FinalProject
+﻿using FinalProject.Magic;
+
+namespace FinalProject
 {
     internal class Inventory
     {
@@ -16,9 +18,13 @@
                     Console.Write("---");
                     Console.SetCursorPosition(x - 1, y + 1);
                     Console.Write("| ");
-                    if (items[i] == '¡') Console.ForegroundColor = ConsoleColor.Cyan;
-                    if (items[i] == 'Â') Console.ForegroundColor = ConsoleColor.Cyan;
-                    if (items[i] == 'ß') Console.ForegroundColor = ConsoleColor.Green;
+                    if (items[i] == 'o') Console.ForegroundColor = Spells.SpellColor('o');
+                    else if (items[i] == '+') Console.ForegroundColor = Spells.SpellColor('+');
+                    else if (items[i] == '╬') Console.ForegroundColor = Spells.SpellColor('╬');
+                    else if (items[i] == '§') Console.ForegroundColor = Spells.SpellColor('§');
+                    else if (items[i] == '¡') Console.ForegroundColor = ConsoleColor.Cyan;
+                    else if (items[i] == 'Â') Console.ForegroundColor = ConsoleColor.Cyan;
+                    else if (items[i] == 'ß') Console.ForegroundColor = ConsoleColor.Green;
                     Console.Write(items[i]);
                     Console.ResetColor();
                     Console.Write(" |");
@@ -39,8 +45,20 @@
         {
             switch (item)
             {
-                case 'ß': //HP Potion
-                    items[7] = 'ß';
+                case 'o': //fireball
+                    items[0] = 'o';
+                    InventoryDisplay();
+                    break;
+                case '+': //hell
+                    items[1] = '+';
+                    InventoryDisplay();
+                    break;
+                case '╬': //lightning
+                    items[2] = '╬';
+                    InventoryDisplay();
+                    break;
+                case '§': //teleport
+                    items[3] = '§';
                     InventoryDisplay();
                     break;
                 case '¡': //wand
@@ -49,6 +67,10 @@
                     break;
                 case 'Â': //armor
                     items[5] = 'Â';
+                    InventoryDisplay();
+                    break;
+                case 'ß': //HP Potion
+                    items[7] = 'ß';
                     InventoryDisplay();
                     break;
                 default:

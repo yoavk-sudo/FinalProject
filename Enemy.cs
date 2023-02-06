@@ -4,32 +4,39 @@ namespace FinalProject
 {
     internal class Enemy
     {
-        public static char avatar = '¤';
-        readonly string _type;
+        public static char Avatar = '¤';
+        public static char TrollAvatar = 'ð';
+        readonly public string Type;
         readonly int _maxHP;
         int _currentHP;
         readonly int _power;
         public static int Diff = 1;
         readonly int _gold;
         int _exp;
-        const int MAXRANGE = 5;
+        public const int MAXRANGE = 5;
+        public const int MELEERANGE = 1;
         //Constructor
         public Enemy(string type, int maxHP, int power)
         {
-            _type = type;
+            Type = type;
             _maxHP = maxHP;
             _currentHP = _maxHP;
             _power = power;
             _gold = GoldAmount(power);
             _exp = Map.LevelNumber * 2;
+            if (Type == "troll") _exp *= 2;
             EnemyList.AddToList(this);
         }
-        public static Enemy CreateEnemy() ///////////////////////////////////////////
+        public static Enemy CreateEnemy(string type) ///////////////////////////////////////////
         {
-            string eType = "1";
             int hp = Map.LevelNumber;
             int pow = Map.LevelNumber * Diff;
-            Enemy enemy = new Enemy(eType, hp, pow);
+            if(type == "troll")
+            {
+                hp *= 2;
+                pow *= 2;
+            }
+            Enemy enemy = new Enemy(type, hp, pow);
             return enemy;
         }
         
@@ -88,62 +95,9 @@ namespace FinalProject
                 EnemyList.RemoveFromList(this);
             }
         }
-        public void DealDamage(Player player)
+        public static void EnemyAttack(Enemy enemy, Player player)
         {
-            //player.TakeDamage(_power);
-        }
-        public bool WithinMoveRange(Player player)
-        {
-            return CalculateDistanceToPlayer(player) <= MAXRANGE && CalculateDistanceToPlayer(player) >= 0;
-        }
-        public int CalculateDistanceToPlayer(Player player)
-        {
-            int xDistance = Math.Abs(this.Coordinates[0] - player.Coordinates[0]);
-            int yDistance = Math.Abs(this.Coordinates[1] - player.Coordinates[1]);
-            if (xDistance < yDistance) return xDistance;
-            return yDistance;
-        }
-        public int CalculateDistanceToPlayer(Player player, int dirX, int dirY)
-        {
-            int xDistance = Math.Abs(this.Coordinates[0] - player.Coordinates[0] + dirX);
-            int yDistance = Math.Abs(this.Coordinates[1] - player.Coordinates[1] + dirY);
-            return xDistance + yDistance;
-        }
-        //Actions
-        public void Move(Player player)
-        {
-            char dir;
-            int dirX = 0, dirY = 0;
-            if (!WithinMoveRange(player)) return;
-            int up = CalculateDistanceToPlayer(player, 0, -1);
-            int right = CalculateDistanceToPlayer(player, 1, 0);
-            int down = CalculateDistanceToPlayer(player, 0, 1);
-            int left = CalculateDistanceToPlayer(player, -1, 0);
-            int[] mins = { up, right, down, left };
-            int cardinal = Array.IndexOf(mins, mins.Min());
-            switch (cardinal)
-            {
-                case 0: //up
-                    dirY = -1;
-                    break;
-                case 1: //right
-                    dirX = 1;
-                    break;
-                case 2: //down
-                    dirY = 1;
-                    break;
-                case 3: //left
-                    dirX = -1;
-                    break;
-                default:
-                    break;
-            }
-            LockEnemyMoveCoordinates(dirX, dirY);
-        }
-        public async void StartAsyncTaskMoveEnemy(Player player)
-        {
-            // Start the task.
-            await Task.Run(() => Move(player));
+            player.TakeDamage(enemy._power);
         }
     }
 }

@@ -7,7 +7,7 @@ namespace FinalProject
 {
     internal class Player
     {
-        public static char avatar = '▲';
+        public static char Avatar = '▲';
         int _maxHP = 20;
         int _maxMP = 5;
         int _manaRegen = 0;
@@ -15,13 +15,15 @@ namespace FinalProject
         public int ExpLvlCap = 10;
         const int TRAPDAMAGE = 1;
         const int MAXGOLD = 9999;
-        Weapon weapon = new Weapon("nothing", 1);
-        Armor armor = new Armor("nothing", 0);
+        public Weapon Weapon = new Weapon("nothing", 0);
+        public Armor Armor = new Armor("nothing", 0);
         public Player(string name)
         {
             this.PlayerName = name;
             NewPlayerStatsReset();
             Console.CursorVisible = false;
+            Spells.spells[3].IsAcquired = true;
+            Inventory.AddToInventory('§');
         }
 
         private void NewPlayerStatsReset()
@@ -66,6 +68,7 @@ namespace FinalProject
                 MP -= Spells.spells[spell].MPCost;
                 HUD.DisplayHUD(this);
                 if (spell == Spells.FindSpell(typeof(Heal))) return magicCoor;
+                if (spell == Spells.FindSpell(typeof(Teleport))) return magicCoor;
                 Console.SetCursorPosition(magicCoor[0], magicCoor[1]);
                 Console.ForegroundColor = Spells.spells[spell].Col;
                 Console.Write(Spells.spells[spell].Symbol);
@@ -114,7 +117,7 @@ namespace FinalProject
         } = 2f;
         public int Damage
         {
-            get { return weapon.weaponDamage; }
+            get { return Weapon.weaponDamage; }
         }
         public double Experience
         {
@@ -162,7 +165,7 @@ namespace FinalProject
         }
 
         #region Player passive "actions"
-        public void TakeDamage(int damage, bool _isTrap)
+        public void TakeDamage(int damage, bool _isTrap = false)
         {
             float rand = new Random().Next(1, 11);
             if (rand <= this.Evasion && !_isTrap)
@@ -170,7 +173,7 @@ namespace FinalProject
                 Log.PrintMessage("You evaded an attack!", ConsoleColor.Cyan);
                 return;
             }
-            int total = damage - armor.ArmorDef;
+            int total = damage - Armor.ArmorDef;
             if (total > 0)//if shield>damage do nothing
             {
                 if (_isTrap) total = damage;
@@ -188,7 +191,13 @@ namespace FinalProject
         {
             if (IsAlive()) return;
             Thread.Sleep(500);
-            GameOver.GameOverDisplay(this);
+            GameOver.PressAnyKeyScreen();
+        }
+        public bool IsAlive()
+        {
+            if (HP > 0) return true;
+            Map.IsAlive = false;
+            return false;
         }
 
         public void Heal(int healAmount)
@@ -197,7 +206,6 @@ namespace FinalProject
             int logHeal = 0;
             if(_maxHP >= HP + healAmount) logHeal = healAmount;
             else logHeal = _maxHP - HP;
-            //else logHeal = _maxHP - HP;
             HP += healAmount;
             if (HP > _maxHP)
             {
@@ -205,12 +213,6 @@ namespace FinalProject
             }
             Log.PrintMessage($"You healed {logHeal} HP", ConsoleColor.Green);
             HUD.DisplayHUD(this);
-        }
-        public bool IsAlive()
-        {
-            if (HP > 0) return true;
-            Map.IsAlive = false;
-            return false;
         }
         private void MPRegen()
         {
@@ -251,19 +253,22 @@ namespace FinalProject
             {
                 Spells.spells[0].IsAcquired = true;
                 Log.PrintMessage($"Learned Fireball! Press {Controls.KeyLayout["fireball"]} to launch a fireball", ConsoleColor.DarkGreen);
-                Spells.DisplaySpells();
+                Log.PrintControls();
+                Inventory.AddToInventory('o');
             }
             if (Level == 4)
             {
                 Spells.spells[1].IsAcquired = true;
                 Log.PrintMessage($"Learned Heal! Press {Controls.KeyLayout["heal"]} to heal", ConsoleColor.DarkGreen);
-                Spells.DisplaySpells();
+                Log.PrintControls();
+                Inventory.AddToInventory('+');
             }
             if (Level == 6)
             {
                 Spells.spells[2].IsAcquired = true;
                 Log.PrintMessage($"Learned Lightning! Press {Controls.KeyLayout["Lightning"]} to bring down a lightning bolt", ConsoleColor.DarkGreen);
-                Spells.DisplaySpells();
+                Log.PrintControls();
+                Inventory.AddToInventory('╬');
             }
         }
         #endregion
@@ -272,6 +277,7 @@ namespace FinalProject
         {
             int spell;
             bool isHeal = false;
+            bool isTele = false;
             switch(input)
             {
                 case 'v':
@@ -284,6 +290,10 @@ namespace FinalProject
                 case 'm':
                     spell = Spells.FindSpell(typeof(Lightning));
                     break;
+                case 't':
+                    spell = Spells.FindSpell(typeof(Teleport));
+                    isTele = true;
+                    break;
                 default:
                     return;
             }
@@ -291,7 +301,7 @@ namespace FinalProject
             if (!Spells.spells[spell].IsAcquired) return;
             if (Spells.spells[spell].Charge != 2)
             {
-                //beep error
+                Console.Beep(250, 150);
                 return;
             }
             if(this.MP < Spells.spells[spell].MPCost)
@@ -303,12 +313,17 @@ namespace FinalProject
             if (isHeal) this.Heal(Magic.Heal.Power);
             int[] XY = DirectionToXY();
             if (Map.WhatIsInNextTile(Coordinates, XY) == 1 && !isHeal) return; //if obstructed
-            Spells.ClearSpellSlate();
             Console.Beep(150, 100);
             Spells.spells[spell].Charge = 0;
             int[] magicCoor = GetCoordinates(XY, spell);
-            Spells.DisplaySpells();
+            Inventory.InventoryDisplay();
             if (isHeal) return;
+            if (isTele)
+            {
+                Spells.TeleportSpell(this, XY[0], XY[1]);
+                Inventory.InventoryDisplay();
+                return;
+            }
             Task<int> t = await Task.Run(() => Spells.MoveSpell(Spells.spells[spell], magicCoor, Direction, this));
         }
         private async Task MoveCollision(char input)
@@ -316,21 +331,21 @@ namespace FinalProject
             switch (input)
             {
                 case 'w':
-                    input = avatar;// '▲';
+                    input = Avatar;// '▲';
                     Direction = "up";
                     break;
                 case 'd':
-                    input = avatar; //'►';
+                    input = Avatar; //'►';
                     if(input == '▲') input = '►';
                     Direction = "right";
                     break;
                 case 's':
-                    input = avatar; //'▼';
+                    input = Avatar; //'▼';
                     if(input == '▲') input = '▼';
                     Direction = "down";
                     break;
                 case 'a':
-                    input = avatar; //'◄';
+                    input = Avatar; //'◄';
                     if(input == '▲') input = '◄';
                     Direction = "left";
                     break;
@@ -369,8 +384,10 @@ namespace FinalProject
             }
             DrawPlayer(input);
             Spells.RechargeSpells(); //Recharge spells
-            Spells.DisplaySpells();
+            Inventory.InventoryDisplay();
             HUD.DisplayHUD(this);
+            EnemyList.ActivateEnemiesInRange(this);
+
         }
         public async Task Move(char direction)
         {
@@ -382,12 +399,12 @@ namespace FinalProject
             int[] XY = DirectionToXY();
             int[] inFront = {Coordinates[0] + XY[0], Coordinates[1] + XY[1]};
             if (ElementsList.ElementByCoordinates(inFront) == '#') return; //Don't interact with traps
-            if (EnemyList.EnemyByCoordinates(inFront) != null) DealDamage(inFront, Damage); //basic attack
+            if (EnemyList.EnemyByCoordinates(inFront) is var enemy && enemy != null) DealDamage(enemy, inFront, Damage); //basic attack
             ElementsList.InteractWithElement(inFront, this);
         }
-        public void DealDamage(int[] cor, int dmg)
+        public void DealDamage(Enemy enemy, int[] cor, int dmg)
         {
-            if(EnemyList.EnemyByCoordinates(cor) == null) return;
+            if(enemy == null) return;
             int critChance = Random.Shared.Next(1, 11);
             int hitChance = Random.Shared.Next(1, 11);
             if (hitChance < 2)
@@ -395,16 +412,17 @@ namespace FinalProject
                 Log.PrintMessage("Enemy dodged your attack!", ConsoleColor.Red);
                 return;
             }
+            dmg += Weapon.weaponDamage;
             if (critChance < 2)
             {
                 dmg *= 2;
                 Log.PrintMessage($"You dealt {dmg} damage!", ConsoleColor.Green);
                 Log.PrintMessage("CRIT", ConsoleColor.DarkYellow);
-                EnemyList.EnemyByCoordinates(cor).TakeDamage(dmg, this);
+                enemy.TakeDamage(dmg, this);
                 return;
             }
             Log.PrintMessage($"You dealt {dmg} damage!", ConsoleColor.Green);
-            EnemyList.EnemyByCoordinates(cor).TakeDamage(dmg, this);
+            enemy.TakeDamage(dmg, this);
         }
         public void UsePotion()
         {

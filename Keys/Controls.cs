@@ -33,6 +33,7 @@
                 "fireball v",
                 "heal u",
                 "lightning m",
+                "teleport t",
                 "potion p"
             });
         }
@@ -64,6 +65,9 @@
                 Console.WriteLine("Enter a key for using lightning (default \'m\'):");
                 char lightning = char.Parse(Console.ReadLine());
                 Console.Clear();
+                Console.WriteLine("Enter a key for using teleport (default \'t\'):");
+                char teleport = char.Parse(Console.ReadLine());
+                Console.Clear();
                 Console.WriteLine("Enter a key for using potion (default \'p\'):");
                 char potion = char.Parse(Console.ReadLine());
                 char[] inputs = { up, right, down, left, act, fireball };
@@ -83,12 +87,12 @@
                     "fireball " + fireball,
                     "heal " + heal,
                     "lightning " + lightning,
+                    "teleport " + teleport,
                     "potion " + potion
                 };
                 File.AppendAllLines(_customFile, lines);
                 KeyLayout.Clear();
                 Console.Clear();
-                //Setup();
             }
             catch (FormatException ex)
             {

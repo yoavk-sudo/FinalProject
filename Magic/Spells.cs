@@ -5,18 +5,12 @@ namespace FinalProject.Magic
     internal static class Spells
     {
         static FireBall fire = new();
-        static Lightning lightning = new();
         static Heal heal = new();
+        static Teleport teleport = new();
+        static Lightning lightning = new();
         static int x = 5, y = 17;
-        readonly public static dynamic[] spells = new dynamic[] { fire , heal, lightning };
-        private static void SetCursorZeros()
-        {
-            Console.SetCursorPosition(0, 0);
-        }
-        private static void SetCursorLockAndAction(dynamic spell)
-        {
-            lock (LockMethods.ActionLock) DrawSpellSlots(spell);
-        }
+        readonly public static dynamic[] spells = new dynamic[] { fire , heal, lightning, teleport };
+
         private static void SetCursorLockAndClearSlate()
         {
             lock (LockMethods.ActionLock)
@@ -35,36 +29,16 @@ namespace FinalProject.Magic
                 Console.ResetColor();
             }
         }
-        public static void DisplaySpells()
+        public static ConsoleColor SpellColor(char symbol)
         {
-            x = 5; y = 17;
-            foreach (var spell in spells)
+            foreach (var item in spells)
             {
-                if(!spell.IsAcquired) continue;
-                SetCursorLockAndAction(spell);
-                x += 5;
-                Console.ResetColor();
+                if (item.Symbol == symbol && item.Charge == 2) return item.Col;
+                if (item.Symbol == symbol && item.Charge == 1) return item.LightCol;
+                if (item.Symbol == symbol && item.Charge == 0) return ConsoleColor.White;
             }
-            SetCursorZeros();
+            return ConsoleColor.Black;
         }
-        private static void DrawSpellSlots(dynamic spell)
-        {
-            Console.SetCursorPosition(x, y);
-            switch (spell.Charge)
-            {
-                case 0:
-                    Console.ForegroundColor = ConsoleColor.White;
-                    break;
-                case 1:
-                    Console.ForegroundColor = spell.LightCol;
-                    break;
-                case 2:
-                    Console.ForegroundColor = spell.Col;
-                    break;
-            }
-            Console.WriteLine(spell.Symbol);
-        }
-
         public static int FindSpell(Type spellType)
         {
             int i = 0;
@@ -87,10 +61,6 @@ namespace FinalProject.Magic
                     spell.Charge++;
                 }
             }
-        }
-        public static async Task ClearSpellSlate()
-        {
-            SetCursorLockAndClearSlate();
         }
         public static async Task<int> MoveSpell(dynamic spell, int[] coordinates, string direction, Player player)
         {   
@@ -119,7 +89,15 @@ namespace FinalProject.Magic
                 }
                 int[] XY = { x, y };
                 int[] inFront = { coordinates[0] + x, coordinates[1] + y };
-                if (EnemyList.EnemyByCoordinates(inFront) != null) player.DealDamage(inFront, spell.Power); ;
+                lock (LockMethods.ActionLock)
+                {
+                    if (EnemyList.EnemyByCoordinates(inFront) is var enemy && enemy != null)
+                    {
+                        player.DealDamage(enemy, inFront, spell.Power);
+                        if (!enemy.IsAlive()) return 0;
+                        EnemyList.AddEnemiesToMoveList(enemy, player);
+                    }
+                }
                 if (Map.WhatIsInNextTile(coordinates, XY) != 0) return -1;
                 SetCursorLockAndDrawSpell(spell, coordinates, x, y);
                 Thread.Sleep(spd);
@@ -127,12 +105,53 @@ namespace FinalProject.Magic
             LockMethods.SetCursorLockAndOneSpace(coordinates, x, y);
             return 1;
         }
-        public static void SpellHit() //maybe private?
+        public static void TeleportSpell(Player player, int x, int y)
         {
-        }
-        private static void SpellDelete()
-        {
-
+            if (Map.WhatIsInNextTile(player.Coordinates, new int[] { x, y }) == 1) return;
+            LockMethods.SetCursorLockAndOneSpace(player.Coordinates);
+            char avatar = Player.Avatar;
+            if (x > 0)
+            {
+                for (int i = 0; i < Teleport.Range; i++)
+                {
+                    if (Map.WhatIsInNextTile(player.Coordinates, new int[] { 1, 0 }) == 1) break;
+                    player.Coordinates[0]++;
+                }
+                if (avatar == '▲') avatar = '►';
+            }
+            else if (x < 0)
+            {
+                for (int i = Teleport.Range; i > 0; i--)
+                {
+                    if (Map.WhatIsInNextTile(player.Coordinates, new int[] { -1, 0 }) == 1) break;
+                    player.Coordinates[0]--;
+                    if (avatar == '▲') avatar = '◄';
+                }
+            }
+            else if (y > 0) 
+            {
+                for (int i = 0; i < Teleport.Range; i++)
+                {
+                    if (Map.WhatIsInNextTile(player.Coordinates, new int[] { 0, 1 }) == 1) break;
+                    player.Coordinates[1]++;
+                    if (avatar == '▲') avatar = '▼';
+                }
+            }
+            else if (y < 0) 
+            {
+                for (int i = Teleport.Range; i > 0; i++)
+                {
+                    if (Map.WhatIsInNextTile(player.Coordinates, new int[] { 0, -1 }) == 1) break;
+                    player.Coordinates[1]--;
+                }
+            }
+            lock (LockMethods.ActionLock)
+            {
+                Console.SetCursorPosition(player.Coordinates[0], player.Coordinates[1]); //position at new coordinates
+                Console.ForegroundColor = ConsoleColor.Blue;
+                Console.Write(avatar); //print player at new coordinates
+                Console.ResetColor();
+            }
         }
     }
 }

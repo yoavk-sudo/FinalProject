@@ -198,11 +198,11 @@ namespace FinalProject.Menus
             {
                 Console.Clear();
                 Console.WriteLine("Choice was invalid");
-                Player.avatar = '▲';
+                Player.Avatar = '▲';
                 DisplayMainMenu();
                 return;
             }
-            Player.avatar = avatars[choice - 1];
+            Player.Avatar = avatars[choice - 1];
             Console.Clear();
         }
 
@@ -221,11 +221,11 @@ namespace FinalProject.Menus
             {
                 Console.Clear();
                 Console.WriteLine("Choice was invalid");
-                Enemy.avatar = '¤'; 
+                Enemy.Avatar = '¤'; 
                 DisplayMainMenu();
                 return;
             }
-            Enemy.avatar = avatars[choice - 1];
+            Enemy.Avatar = avatars[choice - 1];
             Console.Clear();
         }
     }
