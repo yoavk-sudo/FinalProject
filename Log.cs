@@ -52,6 +52,7 @@ namespace FinalProject
             _controls.Add($"{Controls.KeyLayout["fireball"]}: fireball", 9);
             _controls.Add($"{Controls.KeyLayout["heal"]}: heal", 10);
             _controls.Add($"{Controls.KeyLayout["lightning"]}: lightning", 11);
+            _controls.Add($"{Controls.KeyLayout["teleport"]}: teleport", 12);
             PrintControls();
             PrintMessage("Entered floor 1...", ConsoleColor.DarkYellow);
             Console.ResetColor();
@@ -66,6 +67,7 @@ namespace FinalProject
                     if (item.Value == 9 && Spells.spells[0].IsAcquired == false) continue;
                     if (item.Value == 10 && Spells.spells[1].IsAcquired == false) continue;
                     if (item.Value == 11 && Spells.spells[2].IsAcquired == false) continue;
+                    if (item.Value == 12 && Spells.spells[3].IsAcquired == false) continue;
                     Console.Write(item.Key);
                     Console.SetCursorPosition(STARTPOS - 2, item.Value);
                     Console.Write("¦");

@@ -39,14 +39,14 @@
         {
             Console.ForegroundColor= ConsoleColor.Blue;
             Console.SetCursorPosition(STARTINGPOS, 12);
-            Console.Write("╔════════════════════╗");
+            Console.Write("╔═════════════════════╗");
             for (int i = 0; i < 11; i++)
             {
                 Console.SetCursorPosition(STARTINGPOS, 13 + i);
-                Console.Write("║                    ║");
+                Console.Write("║                     ║");
             }
             Console.SetCursorPosition(STARTINGPOS, 23);
-            Console.Write("╚════════════════════╝");
+            Console.Write("╚═════════════════════╝");
         }
     }
 }

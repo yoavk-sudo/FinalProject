@@ -5,8 +5,6 @@ namespace FinalProject
 {
     internal static class CharacterCreation
     {
-        static int levelNum = 1;
-        //public static string LevelPath = "Level_0" + levelNum + ".txt";
         static public Player NewCharacter()
         {
             Console.WriteLine("Create a new character (or type \"exit\" to return to main menu)");

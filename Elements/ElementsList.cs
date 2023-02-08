@@ -1,6 +1,8 @@
 ﻿using FinalProject.Keys;
 using FinalProject.Magic;
+using System.Diagnostics;
 using System.Linq;
+using System.Xml.Linq;
 
 namespace FinalProject.Elements
 {
@@ -90,7 +92,7 @@ namespace FinalProject.Elements
                     RemoveFromWorld(element);
                     Inventory.AddToInventory('¡');//Add to inventory
                     player.Weapon.weaponName = "Simple_Wand";
-                    player.Weapon.weaponDamage = 1;
+                    player.Weapon.weaponDamage = 11;
                     Log.PrintMessage("Got a simple wand!", ConsoleColor.Green);
                     HUD.DisplayHUD(player);
                     break;
@@ -116,10 +118,77 @@ namespace FinalProject.Elements
                     HUD.DisplayHUD(player);
                     break;
                 case '§':
-                    RemoveFromWorld(element);
+                    PurchaseElement(element, player, 400);
+                    break;
+                case 'î':
+                    PurchaseElement(element, player, 500);
+                    break;
+                case 'Õ':
+                    PurchaseElement(element, player, 250);
+                    break;
+                case 'ƒ':
+                    PurchaseElement(element, player, 350);
+                    break;
+                default:
+                    break;
+            }
+        }
+        static void PurchaseElement(char ele, Player player, int price)
+        {
+            string text = $"Do you wish to purchase {ele} for {price}? \'y\' to buy";
+            lock (LockMethods.ActionLock)
+            {
+                Console.SetCursorPosition(0, 20);
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.Write(text);
+                Console.ResetColor();
+                char input = Console.ReadKey(true).Key.ToString().ToLower()[0];
+                for (int i = 0; i < text.Length; i++)
+                {
+                    Console.SetCursorPosition(i, 20);
+                    Console.Write(" ");
+                }
+                if (input != 'y') return;
+                if (player.Gold < price)
+                {
+                    Console.SetCursorPosition(0, 20);
+                    Console.Write("Not enough gold!");
+                    return;
+                }
+            }
+            switch (ele)
+            {
+                case '§':
+                    RemoveFromWorld(ele);
                     Spells.spells[3].IsAcquired = true;
                     Log.PrintMessage($"Got Teleport spell! Press {Controls.KeyLayout["teleport"]} to teleport", ConsoleColor.DarkGreen);
+                    Log.PrintControls();
                     Inventory.AddToInventory('§');
+                    player.Gold -= price;
+                    HUD.DisplayHUD(player);
+                    break;
+                case 'î':
+                    RemoveFromWorld(ele);
+                    player.Weapon.weaponName = "Superior Wand";
+                    player.Weapon.weaponDamage *= 2;
+                    Log.PrintMessage($"Got {player.Weapon.weaponName}!", ConsoleColor.DarkGreen);
+                    Inventory.AddToInventory('î');
+                    player.Gold -= price;
+                    HUD.DisplayHUD(player);
+                    break;
+                case 'Õ':
+                    RemoveFromWorld(ele);
+                    player.MaxHP += 10;
+                    Log.PrintMessage("Got 10 more MAX HP!", ConsoleColor.DarkGreen);
+                    player.Gold -= price;
+                    HUD.DisplayHUD(player);
+                    break;
+                case 'ƒ':
+                    RemoveFromWorld(ele);
+                    player.Evasion += 1;
+                    Log.PrintMessage("Got 1 more evasion!", ConsoleColor.DarkGreen);
+                    player.Gold -= price;   
+                    HUD.DisplayHUD(player);
                     break;
                 default:
                     break;

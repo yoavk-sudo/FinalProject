@@ -23,6 +23,7 @@ namespace FinalProject
                     else if (items[i] == '╬') Console.ForegroundColor = Spells.SpellColor('╬');
                     else if (items[i] == '§') Console.ForegroundColor = Spells.SpellColor('§');
                     else if (items[i] == '¡') Console.ForegroundColor = ConsoleColor.Cyan;
+                    else if (items[i] == 'î') Console.ForegroundColor = ConsoleColor.DarkYellow;
                     else if (items[i] == 'Â') Console.ForegroundColor = ConsoleColor.Cyan;
                     else if (items[i] == 'ß') Console.ForegroundColor = ConsoleColor.Green;
                     Console.Write(items[i]);
@@ -65,6 +66,11 @@ namespace FinalProject
                     items[4] = '¡';
                     InventoryDisplay();
                     break;
+                case 'î': //Superior wand
+                    RemoveFromInventory('¡');
+                    items[4] = 'î';
+                    InventoryDisplay();
+                    break;
                 case 'Â': //armor
                     items[5] = 'Â';
                     InventoryDisplay();
@@ -76,6 +82,7 @@ namespace FinalProject
                 default:
                     break;
             }
+            InventoryDisplay();
         }
         public static void RemoveFromInventory(char item)
         {
@@ -83,6 +90,13 @@ namespace FinalProject
             if (i == -1) return; //return instead of using != so we don't waste time printing the inventory
             items[i] = ' ';
             InventoryDisplay();
+        }
+        public static void RemoveAllFromInventory()
+        {
+            foreach (var item in items)
+            {
+                RemoveFromInventory(item);
+            }
         }
         public static bool IsInInventory(char item)
         {

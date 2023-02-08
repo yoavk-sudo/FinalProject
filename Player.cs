@@ -8,6 +8,7 @@ namespace FinalProject
     internal class Player
     {
         public static char Avatar = '▲';
+        public static int Diff = 1;
         int _maxHP = 20;
         int _maxMP = 5;
         int _manaRegen = 0;
@@ -22,13 +23,12 @@ namespace FinalProject
             this.PlayerName = name;
             NewPlayerStatsReset();
             Console.CursorVisible = false;
-            Spells.spells[3].IsAcquired = true;
-            Inventory.AddToInventory('§');
         }
 
         private void NewPlayerStatsReset()
         {
             _maxHP = 20;
+            if (Diff < 2) _maxHP += 10;
             _maxMP = 5;
             Level = 1;
             ExpLvlCap = 10;
@@ -135,6 +135,16 @@ namespace FinalProject
         {
             get; set;
         } = "up";
+        public int MaxHP
+        {
+            get { return _maxHP; }
+            set { _maxHP = value; }
+        }
+        public int MaxMP
+        {
+            get { return _maxMP; }
+            set { _maxMP = value; }
+        }
         #endregion
 
         public int[] DirectionToXY()
@@ -184,7 +194,7 @@ namespace FinalProject
                 if (HP == 0) Loss();
                 return;
             }
-            Log.PrintMessage($"You blocked that attack!", ConsoleColor.Blue);
+            Log.PrintMessage("You blocked that attack!", ConsoleColor.Blue);
         }
 
         private void Loss()
@@ -266,7 +276,7 @@ namespace FinalProject
             if (Level == 6)
             {
                 Spells.spells[2].IsAcquired = true;
-                Log.PrintMessage($"Learned Lightning! Press {Controls.KeyLayout["Lightning"]} to bring down a lightning bolt", ConsoleColor.DarkGreen);
+                Log.PrintMessage($"Learned Lightning! Press {Controls.KeyLayout["lightning"]} to bring down a lightning bolt", ConsoleColor.DarkGreen);
                 Log.PrintControls();
                 Inventory.AddToInventory('╬');
             }

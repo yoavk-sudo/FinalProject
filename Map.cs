@@ -1,6 +1,7 @@
 ﻿using FinalProject.Elements;
 using FinalProject.Keys;
 using FinalProject.Menus;
+using System.Numerics;
 
 namespace FinalProject
 {
@@ -19,6 +20,7 @@ namespace FinalProject
         public static int[,] MapCol = CollisionMap(LevelPath);
         public static int LowestTile = File.ReadAllLines(LevelPath).GetLength(0);
         public static bool IsAlive = true;
+        private static bool _isAlreadyRunning = false;
 
         /*
          * Create 2 maps, 1 visible, the second is a 2 dimensional array
@@ -52,12 +54,43 @@ namespace FinalProject
                 }
                 Console.WriteLine();
             }
+            if (_isAlreadyRunning) return;
             while (IsAlive)
             {
+                _isAlreadyRunning = true;
                 InputStream.Interperter(player);
             }
             LevelNumber = 1;
-            GameOver.GameOverDisplay(player);
+            GameOver.GameOverDisplay();
+        }
+        public static async void PrintShop(Player player)
+        {
+            PrintUI(player);
+            string[] lines = File.ReadAllLines(LevelPath);
+            Console.SetCursorPosition(0, 0);
+            foreach (string line in lines)
+            {
+                foreach (char tile in line)
+                {
+                    if (tile == '►')
+                    {
+                        player.Coordinates[0] = Console.GetCursorPosition().Left;
+                        player.Coordinates[1] = Console.GetCursorPosition().Top;
+                        Console.ForegroundColor = ConsoleColor.Blue;
+                        Console.Write('►');
+                        Console.ResetColor();
+                        continue;
+                    }
+                    if (!_bgElemnts.Contains(tile)) CharacterToLogic(tile);
+                    else
+                    {
+                        Console.ForegroundColor = ConsoleColor.DarkYellow;
+                        Console.Write(tile);
+                    }
+                    Console.ResetColor();
+                }
+                Console.WriteLine();
+            }
         }
         private static void PrintUI(Player player)
         {
@@ -78,7 +111,7 @@ namespace FinalProject
             {
                 if(maxLength < line.Length) maxLength = line.Length;
             }
-            int[,] collision = new int[maxLength, height];////////////////////////////////////////
+            int[,] collision = new int[maxLength, height];
             foreach(string line in File.ReadAllLines(levelName))
             {
                 if (j >= height) break;
@@ -86,7 +119,7 @@ namespace FinalProject
                 {
                     if (i >= maxLength) break;
                     int[] cor = { i, j };
-                    if (tile == ' ' || tile == '▲' || tile == 'E' || tile == '#') ZeroCoordinate(collision, cor);//collision[i, j] = 0;
+                    if (tile == ' ' || tile == '▲' || tile == 'E' || tile == '#' || tile == '►') ZeroCoordinate(collision, cor);//collision[i, j] = 0;
                     else OneCoordinate(collision, cor);//collision[i, j] = 1;
                     i++;
                 }
@@ -100,20 +133,24 @@ namespace FinalProject
             Console.Clear();
             UpdateLevelPath();
             ElementsList.RemoveAllElements();
-            LowestTile = File.ReadAllLines(LevelPath).GetLength(0);
             Log.PrintMessage("Entered floor " + LevelNumber + "...", ConsoleColor.DarkYellow);
             Log.PrintControls();
-            if (LevelPath != (Directory.GetCurrentDirectory() + "\\Shop.txt"))
+            if (LevelNumber != 6)
             {
+                LowestTile = File.ReadAllLines(LevelPath).GetLength(0);
                 MapCol = CollisionMap(LevelPath);
                 PrintMap(player);
             }
-            else ShopLevel();
+            else ShopLevel(player);
         }
 
-        private static void ShopLevel()
+        private static void ShopLevel(Player player)
         {
-            throw new NotImplementedException();
+            LevelPath = MainMenu.Path + "\\Shop.txt";
+            LowestTile = File.ReadAllLines(LevelPath).GetLength(0);
+            MapCol = CollisionMap(LevelPath);
+            PrintShop(player);
+            LevelPath = MainMenu.Path + "\\Level_06.txt";
         }
 
         public static int WhatIsInNextTile(int[] coordinates, int[] direction)
@@ -128,28 +165,10 @@ namespace FinalProject
             }
             return -1;
         }
-        public static void ZeroCoordinate(int[,] map, int[] cor)
+        private static void UpdateLevelPath()
         {
-            if (cor == null) return; //Object doesn't exist in element dictionary, therefore cor is null
-            map[cor[0], cor[1]] = 0;
-        }
-        public static void OneCoordinate(int[,] map, int[] cor)
-        {
-            map[cor[0], cor[1]] = 1;
-        }
-        public static void TwoCoordinate(int[,] map, int[] cor)
-        {
-            map[cor[0], cor[1]] = 2;
-        }
-        public static void ClearCollisionMap()
-        {
-            for (int i = 0; i < MapCol.GetLength(0); i++)
-            {
-                for (int j = 0; j < MapCol.GetLength(1); j++)
-                {
-                    ZeroCoordinate(MapCol, new int[] { i, j });
-                }
-            }
+            _lvlNum++;
+            LevelPath = "Level_0" + LevelNumber + ".txt";
         }
         private static void CharacterToLogic(char ele)
         {
@@ -171,7 +190,9 @@ namespace FinalProject
                 case '¶': //key
                     Console.ForegroundColor = ConsoleColor.Cyan;
                     ElementsList.AddToList(ele);
-                    break;
+                    Console.Write(ele);
+                    Console.ResetColor(); 
+                    return;
                 case '█': //door
                     Console.ForegroundColor = ConsoleColor.Cyan;
                     ElementsList.AddToList(ele);
@@ -203,14 +224,40 @@ namespace FinalProject
                     Console.ForegroundColor = ConsoleColor.Cyan;
                     ElementsList.AddToList(ele);
                     break;
+                case '§': //teleport spell
+                case 'î': //Superior wand
+                case 'Õ': //Health gem
+                case 'ƒ': //Swift amulet
+                    Console.ForegroundColor = ConsoleColor.DarkYellow; 
+                    ElementsList.AddToList(ele);
+                    break;
             }
+            //if (LevelNumber == 6) Console.ForegroundColor = ConsoleColor.DarkYellow;
             Console.Write(ele);
             Console.ResetColor();
         }
-        private static void UpdateLevelPath()
+        public static void ZeroCoordinate(int[,] map, int[] cor)
         {
-            _lvlNum++;
-            LevelPath = "Level_0" + LevelNumber + ".txt";
+            if (cor == null) return; //Object doesn't exist in element dictionary, therefore cor is null
+            map[cor[0], cor[1]] = 0;
+        }
+        public static void OneCoordinate(int[,] map, int[] cor)
+        {
+            map[cor[0], cor[1]] = 1;
+        }
+        public static void TwoCoordinate(int[,] map, int[] cor)
+        {
+            map[cor[0], cor[1]] = 2;
+        }
+        public static void ClearCollisionMap()
+        {
+            for (int i = 0; i < MapCol.GetLength(0); i++)
+            {
+                for (int j = 0; j < MapCol.GetLength(1); j++)
+                {
+                    ZeroCoordinate(MapCol, new int[] { i, j });
+                }
+            }
         }
     }
 }

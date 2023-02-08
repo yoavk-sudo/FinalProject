@@ -32,7 +32,7 @@ namespace FinalProject.Elements
             int num = _enemies.Count;
             for (int i = 0; i < num; i++)
             {
-                RemoveFromList(_enemies[i]);
+                RemoveFromList(_enemies[0]);
             }
         }
         public static async void AddEnemiesToMoveList(Enemy enemy, Player player)
@@ -55,12 +55,12 @@ namespace FinalProject.Elements
                 else if (x == Enemy.MELEERANGE && y == 0)
                 {
                     Enemy.EnemyAttack(enemy, player);
-                    await Task.Delay(3000);
+                    await Task.Delay(2500);
                 }
                 else
                 {
                     EnemyMove(enemy, player);
-                    await Task.Delay(2000);
+                    await Task.Delay(1500);
                 }
             }
         }

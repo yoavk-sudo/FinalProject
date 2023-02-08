@@ -35,26 +35,11 @@ namespace FinalProject
             {
                 hp *= 2;
                 pow *= 2;
+                pow -= 2;
             }
             Enemy enemy = new Enemy(type, hp, pow);
             return enemy;
         }
-        
-        private void LockEnemyMoveCoordinates(int dirX, int dirY)
-        {
-            if (Map.WhatIsInNextTile(Coordinates, new int[]{ dirX, dirY }) != 0) return;
-            LockMethods.SetCursorLockAndOneSpace(Coordinates); //if not obstructed
-            Coordinates[0] += dirX;
-            Coordinates[1] += dirY;
-            lock (LockMethods.ActionLock)
-            {
-                Console.SetCursorPosition(Coordinates[0], Coordinates[1]);
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.Write('¤');
-                Console.ResetColor();
-            }
-        }
-        
         //Properties
         public int[] Coordinates
         {

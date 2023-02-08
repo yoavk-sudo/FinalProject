@@ -2,8 +2,8 @@
 {
     internal struct LockMethods
     {
-        static public readonly object ActionLock = new object();
-        static public void SetCursorLockAndOneSpace(int[] coordinates, int x = 0, int y = 0)
+        public static readonly object ActionLock = new object();
+        public static void SetCursorLockAndOneSpace(int[] coordinates, int x = 0, int y = 0)
         {
             lock (ActionLock)
             {

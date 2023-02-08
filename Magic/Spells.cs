@@ -8,17 +8,8 @@ namespace FinalProject.Magic
         static Heal heal = new();
         static Teleport teleport = new();
         static Lightning lightning = new();
-        static int x = 5, y = 17;
         readonly public static dynamic[] spells = new dynamic[] { fire , heal, lightning, teleport };
 
-        private static void SetCursorLockAndClearSlate()
-        {
-            lock (LockMethods.ActionLock)
-            {
-                Console.SetCursorPosition(x, y);
-                Console.WriteLine("                             ");
-            }
-        }
         private static void SetCursorLockAndDrawSpell(dynamic spell, int[] coordinates, int x, int y)
         {
             lock (LockMethods.ActionLock)
@@ -91,30 +82,43 @@ namespace FinalProject.Magic
                 int[] inFront = { coordinates[0] + x, coordinates[1] + y };
                 lock (LockMethods.ActionLock)
                 {
-                    if (EnemyList.EnemyByCoordinates(inFront) is var enemy && enemy != null)
+                    if (EnemyList.EnemyByCoordinates(coordinates) is var enWithin && enWithin != null)
+                    {
+                        player.DealDamage(enWithin, coordinates, spell.Power);
+                        if (!enWithin.IsAlive()) return 0;
+                        EnemyList.AddEnemiesToMoveList(enWithin, player);
+                    }
+                    else if (EnemyList.EnemyByCoordinates(inFront) is var enemy && enemy != null)
                     {
                         player.DealDamage(enemy, inFront, spell.Power);
                         if (!enemy.IsAlive()) return 0;
                         EnemyList.AddEnemiesToMoveList(enemy, player);
                     }
+                    if (Map.WhatIsInNextTile(coordinates, XY) != 0) return -1;
+                    SetCursorLockAndDrawSpell(spell, coordinates, x, y);
+                    Thread.Sleep(spd);
                 }
-                if (Map.WhatIsInNextTile(coordinates, XY) != 0) return -1;
-                SetCursorLockAndDrawSpell(spell, coordinates, x, y);
-                Thread.Sleep(spd);
             }
             LockMethods.SetCursorLockAndOneSpace(coordinates, x, y);
             return 1;
         }
+        public static void ResetSpellAcquisition()
+        {
+            for (int i = 0; i < spells.Length; i++)
+            {
+                spells[i].IsAcquired = false;
+            }
+        }
         public static void TeleportSpell(Player player, int x, int y)
         {
-            if (Map.WhatIsInNextTile(player.Coordinates, new int[] { x, y }) == 1) return;
+            if (Map.WhatIsInNextTile(player.Coordinates, new int[] { x, y }) != 0) return;
             LockMethods.SetCursorLockAndOneSpace(player.Coordinates);
             char avatar = Player.Avatar;
             if (x > 0)
             {
                 for (int i = 0; i < Teleport.Range; i++)
                 {
-                    if (Map.WhatIsInNextTile(player.Coordinates, new int[] { 1, 0 }) == 1) break;
+                    if (Map.WhatIsInNextTile(player.Coordinates, new int[] { 1, 0 }) != 0) break;
                     player.Coordinates[0]++;
                 }
                 if (avatar == '▲') avatar = '►';
@@ -123,7 +127,7 @@ namespace FinalProject.Magic
             {
                 for (int i = Teleport.Range; i > 0; i--)
                 {
-                    if (Map.WhatIsInNextTile(player.Coordinates, new int[] { -1, 0 }) == 1) break;
+                    if (Map.WhatIsInNextTile(player.Coordinates, new int[] { -1, 0 }) != 0) break;
                     player.Coordinates[0]--;
                     if (avatar == '▲') avatar = '◄';
                 }
@@ -132,7 +136,7 @@ namespace FinalProject.Magic
             {
                 for (int i = 0; i < Teleport.Range; i++)
                 {
-                    if (Map.WhatIsInNextTile(player.Coordinates, new int[] { 0, 1 }) == 1) break;
+                    if (Map.WhatIsInNextTile(player.Coordinates, new int[] { 0, 1 }) != 0) break;
                     player.Coordinates[1]++;
                     if (avatar == '▲') avatar = '▼';
                 }
@@ -141,7 +145,7 @@ namespace FinalProject.Magic
             {
                 for (int i = Teleport.Range; i > 0; i++)
                 {
-                    if (Map.WhatIsInNextTile(player.Coordinates, new int[] { 0, -1 }) == 1) break;
+                    if (Map.WhatIsInNextTile(player.Coordinates, new int[] { 0, -1 }) != 0) break;
                     player.Coordinates[1]--;
                 }
             }

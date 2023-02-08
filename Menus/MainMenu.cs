@@ -159,6 +159,7 @@ namespace FinalProject.Menus
                         "3. HARD"
                         );
                     int.TryParse(Console.ReadLine(), out Enemy.Diff);
+                    Player.Diff = Enemy.Diff;
                     Console.Clear();
                     if (Enemy.Diff > 3 || Enemy.Diff < 1)
                     {

@@ -70,8 +70,8 @@
                 Console.Clear();
                 Console.WriteLine("Enter a key for using potion (default \'p\'):");
                 char potion = char.Parse(Console.ReadLine());
-                char[] inputs = { up, right, down, left, act, fireball };
-                if (inputs.Distinct().ToArray().Length != inputs.Length)
+                HashSet<char> inputs = new HashSet<char>{ up, right, down, left, act, fireball, heal, lightning, teleport, potion };
+                if (inputs.Count != File.ReadAllLines(_defaultFile).Length)
                 {
                     Console.WriteLine("\nYou have repeated keys. \nPlease enter enter new, non-repeating keys:");
                     NewControls();
