@@ -2,7 +2,7 @@
 {
     internal static class HUD
     {
-        const int STARTINGPOS = 60;
+        const int STARTINGPOS = 55;
         static public void DisplayHUD(Player player)
         {
             lock (LockMethods.ActionLock)
@@ -15,12 +15,12 @@
                 PrintHudLine($"HP:           {player.HP}", x, ref y, ConsoleColor.Green);
                 PrintHudLine($"MP:           {player.MP}", x, ref y, ConsoleColor.Blue);
                 PrintHudLine($"Power:        {player.Damage}", x, ref y, ConsoleColor.Magenta);
+                PrintHudLine($"Defense:      {player.Armor.ArmorDef}", x, ref y, ConsoleColor.Cyan);
                 PrintHudLine($"Evasion:      {player.Evasion}", x, ref y, ConsoleColor.White);
                 PrintHudLine($"Gold:         {player.Gold}", x, ref y, ConsoleColor.Yellow);
                 PrintHudLine($"Level:        {player.Level}", x, ref y, ConsoleColor.DarkYellow);
                 PrintHudLine($"EXP:          {exp}%", x, ref y, ConsoleColor.Cyan);
                 Console.ResetColor();
-                //Console.SetCursorPosition(0, 0);
             }
         }
         private static void PrintHudLine(string stat, int x, ref int y, ConsoleColor colour)
@@ -40,12 +40,12 @@
             Console.ForegroundColor= ConsoleColor.Blue;
             Console.SetCursorPosition(STARTINGPOS, 12);
             Console.Write("╔═════════════════════╗");
-            for (int i = 0; i < 11; i++)
+            for (int i = 0; i < 12; i++)
             {
                 Console.SetCursorPosition(STARTINGPOS, 13 + i);
                 Console.Write("║                     ║");
             }
-            Console.SetCursorPosition(STARTINGPOS, 23);
+            Console.SetCursorPosition(STARTINGPOS, 24);
             Console.Write("╚═════════════════════╝");
         }
     }

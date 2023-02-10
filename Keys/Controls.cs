@@ -2,9 +2,9 @@
 {
     internal class Controls
     {
+        public static Dictionary<string, char> KeyLayout = new Dictionary<string, char>();
         private static string _defaultFile = "Default_Controls.txt";
         private static string _customFile = "Custom_Controls.txt";
-        public static Dictionary<string, char> KeyLayout = new Dictionary<string, char>();
         public static void Setup()
         {
             CreateDefaultControls();

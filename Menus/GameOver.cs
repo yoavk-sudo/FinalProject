@@ -39,7 +39,7 @@ namespace FinalProject.Menus
             }
         }
 
-        private static void ClearAllDataStructures()
+        public static void ClearAllDataStructures()
         {
             Log.ClearControlsLayout();
             Log.ClearLog();
@@ -51,8 +51,7 @@ namespace FinalProject.Menus
             Inventory.RemoveAllFromInventory();
             Map.ClearCollisionMap();
         }
-
-        static public void GameOverChoice()
+        public static void GameOverChoice()
         {
             bool isValid = int.TryParse(Console.ReadLine(), out int choice);
             if (!isValid)

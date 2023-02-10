@@ -1,14 +1,19 @@
 ﻿using FinalProject.Elements;
 using FinalProject.Keys;
 using FinalProject.Menus;
-using System.Numerics;
 
 namespace FinalProject
 {
     internal static class Map
     {
+        public static bool IsAlive = true;
         static int _lvlNum = 1;
         static string LevelPath = MainMenu.Path + "\\Level_0" + LevelNumber + ".txt";
+        public static int[,] MapCol = CollisionMap(LevelPath);
+        public static int LowestTile = File.ReadAllLines(LevelPath).GetLength(0);
+        static char[] _bgElemnts = { ' ', '|','-', '╔', '╚', '╗', '╝', '▲' };
+        private static bool _isAlreadyRunning = false;
+
         public static int LevelNumber {
             get { return _lvlNum; }
             set {
@@ -16,20 +21,6 @@ namespace FinalProject
                 LevelPath = MainMenu.Path + "\\Level_0" + _lvlNum + ".txt";
             } 
         }
-        static char[] _bgElemnts = { ' ', '|','-', '╔', '╚', '╗', '╝', '▲' };
-        public static int[,] MapCol = CollisionMap(LevelPath);
-        public static int LowestTile = File.ReadAllLines(LevelPath).GetLength(0);
-        public static bool IsAlive = true;
-        private static bool _isAlreadyRunning = false;
-
-        /*
-         * Create 2 maps, 1 visible, the second is a 2 dimensional array
-         * the array will represent whether the contents of each tile is traversable
-         * i.e. walls will be '1', or non-traversable
-         * Enemies will also have an exception for being non-traversable through their own coordinates
-         * Enemies also can't traverse through walls etc.
-        */
-
         public static async void PrintMap(Player player)
         {
             PrintUI(player);
@@ -132,11 +123,13 @@ namespace FinalProject
         {
             Console.Clear();
             UpdateLevelPath();
+            EnemyList.TerminateAllEnemies();
             ElementsList.RemoveAllElements();
             Log.PrintMessage("Entered floor " + LevelNumber + "...", ConsoleColor.DarkYellow);
             Log.PrintControls();
-            if (LevelNumber != 6)
+            if (LevelNumber != 6 && LevelNumber != 9)
             {
+                player.Direction = "up";
                 LowestTile = File.ReadAllLines(LevelPath).GetLength(0);
                 MapCol = CollisionMap(LevelPath);
                 PrintMap(player);
@@ -146,7 +139,8 @@ namespace FinalProject
 
         private static void ShopLevel(Player player)
         {
-            LevelPath = MainMenu.Path + "\\Shop.txt";
+            if(LevelNumber == 6) LevelPath = MainMenu.Path + "\\Shop_1.txt";
+            else LevelPath = MainMenu.Path + "\\Shop_2.txt";
             LowestTile = File.ReadAllLines(LevelPath).GetLength(0);
             MapCol = CollisionMap(LevelPath);
             PrintShop(player);
@@ -170,22 +164,59 @@ namespace FinalProject
             _lvlNum++;
             LevelPath = "Level_0" + LevelNumber + ".txt";
         }
+        public static void ZeroCoordinate(int[,] map, int[] cor)
+        {
+            if (cor == null) return; //Object doesn't exist in element dictionary, therefore cor is null
+            try
+            {
+                map[cor[0], cor[1]] = 0;
+            }
+            catch (IndexOutOfRangeException)
+            {
+                Console.WriteLine("Somehow the map didn't load correctly. Bye.");
+                System.Environment.Exit(0);
+            }
+        }
+        public static void OneCoordinate(int[,] map, int[] cor)
+        {
+            map[cor[0], cor[1]] = 1;
+        }
+        public static void TwoCoordinate(int[,] map, int[] cor)
+        {
+            map[cor[0], cor[1]] = 2;
+        }
+        public static void ClearCollisionMap()
+        {
+            for (int i = 0; i < MapCol.GetLength(0); i++)
+            {
+                for (int j = 0; j < MapCol.GetLength(1); j++)
+                {
+                    ZeroCoordinate(MapCol, new int[] { i, j });
+                }
+            }
+        }
         private static void CharacterToLogic(char ele)
         {
             switch (ele)
             {
-                case 'ð': //enemy
+                case '¤': //enemy bat
                     Console.ForegroundColor = ConsoleColor.Red;
-                    Enemy en = Enemy.CreateEnemy("troll");
-                    en.Coordinates[0] = Console.CursorLeft;
-                    en.Coordinates[1] = Console.CursorTop;
-                    break;
-                case '¤': //enemy
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    en = Enemy.CreateEnemy("bat");
+                    Enemy en = Enemy.CreateEnemy("bat");
                     en.Coordinates[0] = Console.CursorLeft;
                     en.Coordinates[1] = Console.CursorTop;
                     ele = Enemy.Avatar;
+                    break;
+                case 'ð': //enemy troll
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    en = Enemy.CreateEnemy("troll");
+                    en.Coordinates[0] = Console.CursorLeft;
+                    en.Coordinates[1] = Console.CursorTop;
+                    break;
+                case 'Ý': //enemy demon
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    en = Enemy.CreateEnemy("demon");
+                    en.Coordinates[0] = Console.CursorLeft;
+                    en.Coordinates[1] = Console.CursorTop;
                     break;
                 case '¶': //key
                     Console.ForegroundColor = ConsoleColor.Cyan;
@@ -228,36 +259,16 @@ namespace FinalProject
                 case 'î': //Superior wand
                 case 'Õ': //Health gem
                 case 'ƒ': //Swift amulet
-                    Console.ForegroundColor = ConsoleColor.DarkYellow; 
+                case '~': //Swift Bracelet
+                case 'M': //Magic Potion
+                case 'Æ': //Wizard's Mantle
+                case '¾': //Stat Gem
+                    Console.ForegroundColor = ConsoleColor.DarkYellow;
                     ElementsList.AddToList(ele);
                     break;
             }
-            //if (LevelNumber == 6) Console.ForegroundColor = ConsoleColor.DarkYellow;
             Console.Write(ele);
             Console.ResetColor();
-        }
-        public static void ZeroCoordinate(int[,] map, int[] cor)
-        {
-            if (cor == null) return; //Object doesn't exist in element dictionary, therefore cor is null
-            map[cor[0], cor[1]] = 0;
-        }
-        public static void OneCoordinate(int[,] map, int[] cor)
-        {
-            map[cor[0], cor[1]] = 1;
-        }
-        public static void TwoCoordinate(int[,] map, int[] cor)
-        {
-            map[cor[0], cor[1]] = 2;
-        }
-        public static void ClearCollisionMap()
-        {
-            for (int i = 0; i < MapCol.GetLength(0); i++)
-            {
-                for (int j = 0; j < MapCol.GetLength(1); j++)
-                {
-                    ZeroCoordinate(MapCol, new int[] { i, j });
-                }
-            }
         }
     }
 }

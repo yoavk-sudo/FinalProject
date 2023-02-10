@@ -4,11 +4,11 @@ namespace FinalProject
 {
     internal class Inventory
     {
-        static char[] items = {' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '};
+        static char[] _items = {' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '};
         public static string[] InventoryDisplay()
         {
             int x = 5, y = Map.LowestTile + 3;
-            int size = items.Length;
+            int size = _items.Length;
             string[] slots = new string[size];
             for (int i = 0; i < size; i++)
             {
@@ -18,15 +18,17 @@ namespace FinalProject
                     Console.Write("---");
                     Console.SetCursorPosition(x - 1, y + 1);
                     Console.Write("| ");
-                    if (items[i] == 'o') Console.ForegroundColor = Spells.SpellColor('o');
-                    else if (items[i] == '+') Console.ForegroundColor = Spells.SpellColor('+');
-                    else if (items[i] == '╬') Console.ForegroundColor = Spells.SpellColor('╬');
-                    else if (items[i] == '§') Console.ForegroundColor = Spells.SpellColor('§');
-                    else if (items[i] == '¡') Console.ForegroundColor = ConsoleColor.Cyan;
-                    else if (items[i] == 'î') Console.ForegroundColor = ConsoleColor.DarkYellow;
-                    else if (items[i] == 'Â') Console.ForegroundColor = ConsoleColor.Cyan;
-                    else if (items[i] == 'ß') Console.ForegroundColor = ConsoleColor.Green;
-                    Console.Write(items[i]);
+                    if (_items[i] == 'o') Console.ForegroundColor = Spells.SpellColor('o');
+                    else if (_items[i] == '+') Console.ForegroundColor = Spells.SpellColor('+');
+                    else if (_items[i] == '╬') Console.ForegroundColor = Spells.SpellColor('╬');
+                    else if (_items[i] == '§') Console.ForegroundColor = Spells.SpellColor('§');
+                    else if (_items[i] == '¡') Console.ForegroundColor = ConsoleColor.Cyan;
+                    else if (_items[i] == 'î') Console.ForegroundColor = ConsoleColor.DarkYellow;
+                    else if (_items[i] == 'Â') Console.ForegroundColor = ConsoleColor.Cyan;
+                    else if (_items[i] == 'Æ') Console.ForegroundColor = ConsoleColor.DarkYellow;
+                    else if (_items[i] == 'ß') Console.ForegroundColor = ConsoleColor.Green;
+                    else if (_items[i] == 'M') Console.ForegroundColor = ConsoleColor.Blue;
+                    Console.Write(_items[i]);
                     Console.ResetColor();
                     Console.Write(" |");
                     Console.SetCursorPosition(x, y + 2);
@@ -47,36 +49,44 @@ namespace FinalProject
             switch (item)
             {
                 case 'o': //fireball
-                    items[0] = 'o';
+                    _items[0] = 'o';
                     InventoryDisplay();
                     break;
                 case '+': //hell
-                    items[1] = '+';
+                    _items[1] = '+';
                     InventoryDisplay();
                     break;
                 case '╬': //lightning
-                    items[2] = '╬';
+                    _items[2] = '╬';
                     InventoryDisplay();
                     break;
                 case '§': //teleport
-                    items[3] = '§';
+                    _items[3] = '§';
                     InventoryDisplay();
                     break;
                 case '¡': //wand
-                    items[4] = '¡';
+                    _items[4] = '¡';
                     InventoryDisplay();
                     break;
                 case 'î': //Superior wand
                     RemoveFromInventory('¡');
-                    items[4] = 'î';
+                    _items[4] = 'î';
                     InventoryDisplay();
                     break;
                 case 'Â': //armor
-                    items[5] = 'Â';
+                    _items[5] = 'Â';
+                    InventoryDisplay();
+                    break;
+                case 'Æ': //armor
+                    _items[5] = 'Æ';
+                    InventoryDisplay();
+                    break;
+                case 'M': //manaGen
+                    _items[6] = 'M';
                     InventoryDisplay();
                     break;
                 case 'ß': //HP Potion
-                    items[7] = 'ß';
+                    _items[7] = 'ß';
                     InventoryDisplay();
                     break;
                 default:
@@ -86,21 +96,21 @@ namespace FinalProject
         }
         public static void RemoveFromInventory(char item)
         {
-            int i = Array.IndexOf(items, item);
+            int i = Array.IndexOf(_items, item);
             if (i == -1) return; //return instead of using != so we don't waste time printing the inventory
-            items[i] = ' ';
+            _items[i] = ' ';
             InventoryDisplay();
         }
         public static void RemoveAllFromInventory()
         {
-            foreach (var item in items)
+            foreach (var item in _items)
             {
                 RemoveFromInventory(item);
             }
         }
         public static bool IsInInventory(char item)
         {
-            return items.Contains(item);
+            return _items.Contains(item);
         }
     }
 }

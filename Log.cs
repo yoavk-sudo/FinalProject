@@ -68,7 +68,9 @@ namespace FinalProject
                     if (item.Value == 10 && Spells.spells[1].IsAcquired == false) continue;
                     if (item.Value == 11 && Spells.spells[2].IsAcquired == false) continue;
                     if (item.Value == 12 && Spells.spells[3].IsAcquired == false) continue;
+                    if (item.Value == 6 || item.Value == 7) Console.ForegroundColor = ConsoleColor.Cyan;
                     Console.Write(item.Key);
+                    Console.ResetColor();
                     Console.SetCursorPosition(STARTPOS - 2, item.Value);
                     Console.Write("¦");
                 }

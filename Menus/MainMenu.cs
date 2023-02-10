@@ -5,7 +5,7 @@ namespace FinalProject.Menus
     internal static class MainMenu
     {
         public static string Path = Directory.GetCurrentDirectory();
-        static private bool _save = true;
+        private static bool _save = true;
         const int STARTIGNPOS = 55;
         const int LOGOPOS = 50;
         static public void DisplayMainMenu()
@@ -40,7 +40,7 @@ namespace FinalProject.Menus
             Console.WriteLine("6. Exit Game");
             MainMenuChoice();
         }
-        static public void MainMenuChoice()
+        public static void MainMenuChoice()
         {
             Console.WriteLine();
             bool isValid = int.TryParse(Console.ReadLine() ,out int choice);
@@ -97,15 +97,7 @@ namespace FinalProject.Menus
                     return;
                 case 5:
                     Console.Clear();
-                    Console.SetCursorPosition(STARTIGNPOS, 2);
-                    Console.WriteLine("CREDITS\n" +
-                        "\t\tGame Designer:\n\n\t\t\tYoav Kendler\n\n" +
-                        "\t\tLead Developer:\n\n\t\t\tYoav Kendler\n\n" +
-                        "\t\tLead Art:\n\n\t\t\tYoav Kendler (and various ascii art websites found online)\n\n" +
-                        "\t\tMusic:\n\n\t\t\tConsole.Beep()\n\n" +
-                        "\t\tNarrative:\n\n\t\t\tYoav Kendler\n\n" +
-                        "\t\tLecturer:\n\n\t\t\tDor Ben Dor");
-                    Console.ReadKey();
+                    WinScreen.CreditsPage();
                     Console.Clear();
                     DisplayMainMenu();
                     return;
@@ -118,7 +110,6 @@ namespace FinalProject.Menus
                     return;
             }
         }
-
         private static void SettingsMenu()
         {
             Console.WriteLine("1. Change player avatar");
@@ -183,7 +174,6 @@ namespace FinalProject.Menus
                     return;
             }
         }
-
         private static void PlayerAvatarMenu()
         {
             char[] avatars = { '▲', '@', '©', '☻', '☺' };
@@ -206,7 +196,6 @@ namespace FinalProject.Menus
             Player.Avatar = avatars[choice - 1];
             Console.Clear();
         }
-
         private static void EnemyAvatarMenu()
         {
             char[] avatars = { '¤', '¢', '*', '&', 'x', 'Þ' };

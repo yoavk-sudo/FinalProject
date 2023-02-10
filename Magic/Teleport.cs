@@ -3,7 +3,7 @@
     internal struct Teleport //struct?
     {
         // make stuff const?
-        readonly public int MPCost = 2;
+        readonly public int MPCost = 1;
         readonly public char Symbol = '§';
         public int Charge = 2;
         readonly public static int Range = 5;

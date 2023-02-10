@@ -7,17 +7,17 @@ namespace FinalProject
 {
     internal class Player
     {
+        public Weapon Weapon = new Weapon("nothing", 1);
+        public Armor Armor = new Armor("nothing", 1);
         public static char Avatar = '▲';
         public static int Diff = 1;
+        public int ExpLvlCap = 10;
         int _maxHP = 20;
         int _maxMP = 5;
         int _manaRegen = 0;
-        int _manaCounter = 5;
-        public int ExpLvlCap = 10;
+        public int ManaCounter = 5;
         const int TRAPDAMAGE = 1;
         const int MAXGOLD = 9999;
-        public Weapon Weapon = new Weapon("nothing", 0);
-        public Armor Armor = new Armor("nothing", 0);
         public Player(string name)
         {
             this.PlayerName = name;
@@ -88,13 +88,14 @@ namespace FinalProject
         }
         private void TrySetCursorInRange()
         {
-            Console.SetCursorPosition(Coordinates[0], Coordinates[1] - 1);
+            lock (LockMethods.ActionLock)
+            {
+                Console.SetCursorPosition(Coordinates[0], Coordinates[1] - 1);
+            }
         }
         #endregion
 
-        //constructor
         #region Player Stats
-        //attributes //will need to become private
         public string PlayerName
         {
             get; set;
@@ -184,9 +185,19 @@ namespace FinalProject
                 return;
             }
             int total = damage - Armor.ArmorDef;
+            if (_isTrap)
+            {
+                HP -= damage;
+                if (HP <= 0)
+                {
+                    HP = 0;
+                    Loss();
+                }
+                HUD.DisplayHUD(this);
+                return;
+            }
             if (total > 0)//if shield>damage do nothing
             {
-                if (_isTrap) total = damage;
                 HP = HP - total;
                 if (HP <= 0) HP = 0;
                 Log.PrintMessage($"You took {total} damage! HP is {HP}" , ConsoleColor.Red);
@@ -226,9 +237,9 @@ namespace FinalProject
         }
         private void MPRegen()
         {
-            if (_manaRegen++ < _manaCounter) return;
+            if (_manaRegen++ < ManaCounter) return;
             _manaRegen = 0;
-            if (this.MP >= this._maxMP) return;
+            if (this.MP >= this.MaxMP) return;
             this.MP++;
         }
         public void GetGold(int goldAmount)
@@ -373,6 +384,7 @@ namespace FinalProject
             int[] XY = DirectionToXY();
             if (Map.WhatIsInNextTile(Coordinates, XY) == 2)
             {
+                Spells.IsSpellTerminate = true;
                 Map.LoadNextLevel(this);
                 return;
             }
@@ -394,10 +406,8 @@ namespace FinalProject
             }
             DrawPlayer(input);
             Spells.RechargeSpells(); //Recharge spells
-            Inventory.InventoryDisplay();
             HUD.DisplayHUD(this);
             EnemyList.ActivateEnemiesInRange(this);
-
         }
         public async Task Move(char direction)
         {
@@ -412,15 +422,15 @@ namespace FinalProject
             if (EnemyList.EnemyByCoordinates(inFront) is var enemy && enemy != null) DealDamage(enemy, inFront, Damage); //basic attack
             ElementsList.InteractWithElement(inFront, this);
         }
-        public void DealDamage(Enemy enemy, int[] cor, int dmg)
+        public bool DealDamage(Enemy enemy, int[] cor, int dmg)
         {
-            if(enemy == null) return;
+            if (enemy == null) return false;
             int critChance = Random.Shared.Next(1, 11);
             int hitChance = Random.Shared.Next(1, 11);
             if (hitChance < 2)
             {
                 Log.PrintMessage("Enemy dodged your attack!", ConsoleColor.Red);
-                return;
+                return false;
             }
             dmg += Weapon.weaponDamage;
             if (critChance < 2)
@@ -429,10 +439,11 @@ namespace FinalProject
                 Log.PrintMessage($"You dealt {dmg} damage!", ConsoleColor.Green);
                 Log.PrintMessage("CRIT", ConsoleColor.DarkYellow);
                 enemy.TakeDamage(dmg, this);
-                return;
+                return true;
             }
             Log.PrintMessage($"You dealt {dmg} damage!", ConsoleColor.Green);
             enemy.TakeDamage(dmg, this);
+            return true;
         }
         public void UsePotion()
         {
