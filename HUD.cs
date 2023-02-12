@@ -5,12 +5,12 @@
         const int STARTINGPOS = 55;
         static public void DisplayHUD(Player player)
         {
+            int x = STARTINGPOS + 3;
+            int y = 14;
+            string exp = (player.Experience / player.ExpLvlCap * 100).ToString("0");
             lock (LockMethods.ActionLock)
             {
                 PrintBorders();
-                int x = STARTINGPOS + 3;
-                int y = 14;
-                string exp = (player.Experience / player.ExpLvlCap * 100).ToString("0");
                 PrintHudLine($"{player.PlayerName}", x, ref y, ConsoleColor.White);
                 PrintHudLine($"HP:           {player.HP}", x, ref y, ConsoleColor.Green);
                 PrintHudLine($"MP:           {player.MP}", x, ref y, ConsoleColor.Blue);

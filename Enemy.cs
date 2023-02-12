@@ -9,12 +9,12 @@ namespace FinalProject
         public static char TrollAvatar = 'ð';
         public static char DemonAvatar= 'Ý';
         public static int Diff = 1;
-        readonly public string Type;
-        readonly int _maxHP;
+        public readonly string Type;
         public const int MAXRANGE = 5;
         public const int MELEERANGE = 1;
         int _currentHP;
-        int _exp;
+        readonly int _maxHP;
+        readonly int _exp;
         readonly int _power;
         readonly int _gold;
         //Constructor
@@ -41,9 +41,8 @@ namespace FinalProject
             }
             else if (type == "demon")
             {
-                hp *= 4;
+                hp = 50;
                 pow *= 3;
-                pow -= 2;
             }
             Enemy enemy = new Enemy(type, hp, pow);
             return enemy;
@@ -70,7 +69,7 @@ namespace FinalProject
             return true;
         }
 
-        private int GoldAmount(int power)
+        private static int GoldAmount(int power)
         {
             int min = power * 2;
             int max = power * 3;

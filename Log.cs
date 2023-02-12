@@ -64,10 +64,10 @@ namespace FinalProject
                 foreach (var item in _controls)
                 {
                     Console.SetCursorPosition(STARTPOS - 20, item.Value);
-                    if (item.Value == 9 && Spells.spells[0].IsAcquired == false) continue;
-                    if (item.Value == 10 && Spells.spells[1].IsAcquired == false) continue;
-                    if (item.Value == 11 && Spells.spells[2].IsAcquired == false) continue;
-                    if (item.Value == 12 && Spells.spells[3].IsAcquired == false) continue;
+                    if (item.Value == 9 && Spells.SpellsArray[0].IsAcquired == false) continue;
+                    if (item.Value == 10 && Spells.SpellsArray[1].IsAcquired == false) continue;
+                    if (item.Value == 11 && Spells.SpellsArray[2].IsAcquired == false) continue;
+                    if (item.Value == 12 && Spells.SpellsArray[3].IsAcquired == false) continue;
                     if (item.Value == 6 || item.Value == 7) Console.ForegroundColor = ConsoleColor.Cyan;
                     Console.Write(item.Key);
                     Console.ResetColor();

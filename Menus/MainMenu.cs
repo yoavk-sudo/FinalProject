@@ -5,9 +5,11 @@ namespace FinalProject.Menus
     internal static class MainMenu
     {
         public static string Path = Directory.GetCurrentDirectory();
-        private static bool _save = true;
         const int STARTIGNPOS = 55;
         const int LOGOPOS = 50;
+        const string INSTRUCTIONS = "Most elements in the game can be interacted with when faced directly via the \'e\' key.\n" +
+                        "It also allows you to damage enemies from up close, without expending MP with magic.\n" +
+                        "After unlocking spells, press their corresponding key to fire them at enemies at a distance.";
         static public void DisplayMainMenu()
         {
             Console.BackgroundColor = ConsoleColor.DarkCyan;
@@ -22,13 +24,8 @@ namespace FinalProject.Menus
             Console.WriteLine();
             Console.SetCursorPosition(STARTIGNPOS, 8);
             Console.WriteLine("1. New Game");
-            if (!File.Exists(Path + "\\Saves.txt"))
-            {
-                _save = false;
-                Console.ForegroundColor = ConsoleColor.DarkGray;
-            }
             Console.SetCursorPosition(STARTIGNPOS, 9);
-            Console.WriteLine("2. Load Game");
+            Console.WriteLine("2. READ ME");
             Console.ResetColor();
             Console.SetCursorPosition(STARTIGNPOS, 10);
             Console.WriteLine("3. Settings");
@@ -58,15 +55,12 @@ namespace FinalProject.Menus
                     CharacterCreation.NewCharacter();
                     return;
                 case 2:
-                    if (!_save)
-                    {
-                        Audio.playAudio("Error.wav");
-                        Console.Clear();
-                        Console.SetCursorPosition(0, 14);
-                        Console.WriteLine("No existing save file found");
-                        DisplayMainMenu();
-                        return;
-                    }
+                    Console.Clear();
+                    Console.WriteLine(INSTRUCTIONS);
+                    Console.Write("... ");
+                    Console.ReadKey(true);
+                    Console.Clear();
+                    DisplayMainMenu();
                     return;
                 case 3:
                     Console.Clear();
@@ -119,7 +113,12 @@ namespace FinalProject.Menus
             Console.WriteLine("5. Change difficulty");
             Console.WriteLine("6. Change console title");
             Console.WriteLine("7. Return to main menu");
-            switch (int.Parse(Console.ReadLine()))
+            if (!int.TryParse(Console.ReadLine(), out int choice))
+            {
+                Console.Clear();
+                DisplayMainMenu();
+            }
+            switch (choice)
             {
                 case 1:
                     Console.Clear();
@@ -154,7 +153,7 @@ namespace FinalProject.Menus
                     Console.Clear();
                     if (Enemy.Diff > 3 || Enemy.Diff < 1)
                     {
-                        Console.WriteLine("Set difficulty to hard");
+                        Console.WriteLine("Set difficulty to hard :P");
                         Enemy.Diff = 3;
                     }
                     return;

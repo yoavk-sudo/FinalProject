@@ -19,7 +19,6 @@ namespace FinalProject
             }    
             Map.MapCol = Map.CollisionMap(MainMenu.Path + "\\Level_01.txt");
             Player player = new(name);
-            //Save.SaveGame(player);
             Console.Clear();
             Controls.Setup();
             Log.SetControlsDictionary();

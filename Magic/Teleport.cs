@@ -2,16 +2,15 @@
 {
     internal struct Teleport //struct?
     {
-        // make stuff const?
-        readonly public int MPCost = 1;
-        readonly public char Symbol = '§';
+        public readonly char Symbol = '§';
+        public readonly int MPCost = 1;
+        public readonly int Power = 0;
+        public readonly float Speed = 0; ///Speed - lower values are faster
+        public readonly static int Range = 5;
+        public readonly ConsoleColor Col = ConsoleColor.DarkYellow;
+        public readonly ConsoleColor LightCol = ConsoleColor.Yellow;
         public int Charge = 2;
-        readonly public static int Range = 5;
-        readonly public int Power = 0;
-        readonly public float Speed = 0;
         public bool IsAcquired = false;
-        readonly public ConsoleColor Col = ConsoleColor.DarkYellow;
-        readonly public ConsoleColor LightCol = ConsoleColor.Yellow;
         public Teleport()
         {
 

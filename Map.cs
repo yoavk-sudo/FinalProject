@@ -11,12 +11,13 @@ namespace FinalProject
         static string LevelPath = MainMenu.Path + "\\Level_0" + LevelNumber + ".txt";
         public static int[,] MapCol = CollisionMap(LevelPath);
         public static int LowestTile = File.ReadAllLines(LevelPath).GetLength(0);
-        static char[] _bgElemnts = { ' ', '|','-', '╔', '╚', '╗', '╝', '▲' };
         private static bool _isAlreadyRunning = false;
+        readonly static char[] _bgElemnts = { ' ', '|','-', '╔', '╚', '╗', '╝', '▲' };
 
         public static int LevelNumber {
             get { return _lvlNum; }
-            set {
+            set 
+            {
                 _lvlNum = value;
                 LevelPath = MainMenu.Path + "\\Level_0" + _lvlNum + ".txt";
             } 
@@ -25,25 +26,28 @@ namespace FinalProject
         {
             PrintUI(player);
             string[] lines = File.ReadAllLines(LevelPath);
-            Console.SetCursorPosition(0, 0);
-            foreach (string line in lines)
+            lock (LockMethods.ActionLock)
             {
-                foreach (char tile in line)
+                Console.SetCursorPosition(0, 0);
+                foreach (string line in lines)
                 {
-                    if (tile == '▲')
+                    foreach (char tile in line)
                     {
-                        player.Coordinates[0] = Console.GetCursorPosition().Left;
-                        player.Coordinates[1] = Console.GetCursorPosition().Top;
-                        Console.ForegroundColor = ConsoleColor.Blue;
-                        Console.Write(Player.Avatar);
+                        if (tile == '▲')
+                        {
+                            player.Coordinates[0] = Console.GetCursorPosition().Left;
+                            player.Coordinates[1] = Console.GetCursorPosition().Top;
+                            Console.ForegroundColor = ConsoleColor.Blue;
+                            Console.Write(Player.Avatar);
+                            Console.ResetColor();
+                            continue;
+                        }
+                        if (!_bgElemnts.Contains(tile)) CharacterToLogic(tile);
+                        else Console.Write(tile);
                         Console.ResetColor();
-                        continue;
                     }
-                    if (!_bgElemnts.Contains(tile)) CharacterToLogic(tile);
-                    else Console.Write(tile);
-                    Console.ResetColor();
+                    Console.WriteLine();
                 }
-                Console.WriteLine();
             }
             if (_isAlreadyRunning) return;
             while (IsAlive)
@@ -144,6 +148,7 @@ namespace FinalProject
             LowestTile = File.ReadAllLines(LevelPath).GetLength(0);
             MapCol = CollisionMap(LevelPath);
             PrintShop(player);
+            Log.PrintMessage("You hear rustling of gold coins as you spot the shopkeeper", ConsoleColor.DarkYellow);
             LevelPath = MainMenu.Path + "\\Level_06.txt";
         }
 
@@ -199,6 +204,9 @@ namespace FinalProject
         {
             switch (ele)
             {
+                case 'E': //entrance
+                    ElementsList.AddToList(ele);
+                    break;
                 case '¤': //enemy bat
                     Console.ForegroundColor = ConsoleColor.Red;
                     Enemy en = Enemy.CreateEnemy("bat");
@@ -255,6 +263,7 @@ namespace FinalProject
                     Console.ForegroundColor = ConsoleColor.Cyan;
                     ElementsList.AddToList(ele);
                     break;
+                //Shop items:
                 case '§': //teleport spell
                 case 'î': //Superior wand
                 case 'Õ': //Health gem

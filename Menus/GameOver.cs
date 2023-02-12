@@ -28,14 +28,8 @@ namespace FinalProject.Menus
                 Console.WriteLine("************");
                 Console.ResetColor();
                 Thread.Sleep(200);
-                Console.SetCursorPosition(50, 5);
-                Console.WriteLine("1. Main Menu");
-                Console.SetCursorPosition(50, 6);
-                Console.WriteLine("2. Exit Game");
+                Console.ReadKey(true);
                 Console.CursorVisible = true;
-                //Map.LevelNumber = 1;
-                Map.IsAlive= true;
-                GameOverChoice();
             }
         }
 
@@ -50,29 +44,6 @@ namespace FinalProject.Menus
             EnemyList.TerminateAllEnemies();
             Inventory.RemoveAllFromInventory();
             Map.ClearCollisionMap();
-        }
-        public static void GameOverChoice()
-        {
-            bool isValid = int.TryParse(Console.ReadLine(), out int choice);
-            if (!isValid)
-            {
-                Console.Clear();
-                GameOverDisplay();
-                return;
-            }
-            switch (choice)
-            {
-                case 1:
-                    Console.Clear();
-                    MainMenu.DisplayMainMenu();
-                    return;
-                case 2:
-                    Environment.Exit(0);
-                    break;
-                default:
-                    GameOverDisplay();
-                    return;
-            }
         }
     }
 }

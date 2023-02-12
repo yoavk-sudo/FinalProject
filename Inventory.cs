@@ -36,7 +36,7 @@ namespace FinalProject
                     Console.SetCursorPosition(x + 2, y);
                     x += 6;
                 }
-                if (i == 3)
+                if (i == 3) // new row after 4 items
                 {
                     y += 4;
                     x -= 24;

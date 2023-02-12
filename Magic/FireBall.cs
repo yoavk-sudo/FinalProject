@@ -2,16 +2,15 @@
 {
     internal struct FireBall //struct?
     {
-        // make stuff const?
-        readonly public int MPCost = 2;
-        readonly public char Symbol = 'o';
+        public readonly char Symbol = 'o';
+        public readonly int MPCost = 2;
+        public readonly int Range = 4;
+        public readonly int Power = 4;
+        public readonly float Speed = 0.55f; ///Speed - lower values are faster
+        public readonly ConsoleColor Col = ConsoleColor.DarkRed;
+        public readonly ConsoleColor LightCol = ConsoleColor.Red;
         public int Charge = 2;
-        readonly public int Range = 4;
-        readonly public int Power = 4;
-        readonly public float Speed = 0.55f; ///?
         public bool IsAcquired = false;
-        readonly public ConsoleColor Col = ConsoleColor.DarkRed;
-        readonly public ConsoleColor LightCol = ConsoleColor.Red;
         public FireBall()
         {
 

@@ -2,15 +2,15 @@
 {
     internal struct Lightning
     {
-        readonly public int MPCost = 8;
-        readonly public char Symbol = '╬';
+        public readonly char Symbol = '╬';
+        public readonly int MPCost = 8;
+        public readonly int Range = 6;
+        public readonly int Power = 7;
+        public readonly float Speed = 0.15f; ///Speed - lower values are faster
+        public readonly ConsoleColor Col = ConsoleColor.DarkCyan;
+        public readonly ConsoleColor LightCol = ConsoleColor.Cyan;
         public int Charge = 2;
-        readonly public int Range = 6;
-        readonly public int Power = 6;
-        readonly public float Speed = 0.15f; ///?
         public bool IsAcquired = false;
-        readonly public ConsoleColor Col = ConsoleColor.DarkCyan;
-        readonly public ConsoleColor LightCol = ConsoleColor.Cyan;
         public Lightning()
         {
 

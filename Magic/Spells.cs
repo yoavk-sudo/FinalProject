@@ -5,14 +5,14 @@ namespace FinalProject.Magic
     internal static class Spells
     {
         public static bool IsSpellTerminate = false;
-        static FireBall fire = new();
-        static Heal heal = new();
-        static Teleport teleport = new();
-        static Lightning lightning = new();
-        readonly public static dynamic[] spells = new dynamic[] { fire , heal, lightning, teleport };
+        static FireBall _fire = new();
+        static Heal _heal = new();
+        static Teleport _teleport = new();
+        static Lightning _lightning = new();
+        readonly public static dynamic[] SpellsArray = new dynamic[] { _fire , _heal, _lightning, _teleport };
         public static ConsoleColor SpellColor(char symbol)
         {
-            foreach (var item in spells)
+            foreach (var item in SpellsArray)
             {
                 if (item.Symbol == symbol && item.Charge == 2) return item.Col;
                 if (item.Symbol == symbol && item.Charge == 1) return item.LightCol;
@@ -23,7 +23,7 @@ namespace FinalProject.Magic
         public static int FindSpell(Type spellType)
         {
             int i = 0;
-            foreach(dynamic spell in spells)
+            foreach(dynamic spell in SpellsArray)
             {
                 if(spell.GetType() == spellType)
                 {
@@ -35,7 +35,7 @@ namespace FinalProject.Magic
         }
         public static void RechargeSpells()
         {
-            foreach (var spell in spells)
+            foreach (var spell in SpellsArray)
             {
                 if (spell.Charge < 2)
                 {
@@ -80,13 +80,13 @@ namespace FinalProject.Magic
                 {
                     if (EnemyList.EnemyByCoordinates(coordinates) is var enWithin && enWithin != null)
                     {
-                        if(player.DealDamage(enWithin, coordinates, spell.Power + player.Damage)) return 1;
+                        if(player.DealDamage(enWithin, spell.Power + player.Damage)) return 1;
                         if (!enWithin.IsAlive()) return 0;
                         EnemyList.AddEnemiesToMoveList(enWithin, player);
                     }
                     else if (EnemyList.EnemyByCoordinates(inFront) is var enemyFront && enemyFront != null)
                     {
-                        player.DealDamage(enemyFront, inFront, spell.Power + player.Damage);
+                        player.DealDamage(enemyFront, spell.Power + player.Damage);
                         if (!enemyFront.IsAlive()) return 0;
                         EnemyList.AddEnemiesToMoveList(enemyFront, player);
                     }
@@ -100,9 +100,9 @@ namespace FinalProject.Magic
         }
         public static void ResetSpellAcquisition()
         {
-            for (int i = 0; i < spells.Length; i++)
+            for (int i = 0; i < SpellsArray.Length; i++)
             {
-                spells[i].IsAcquired = false;
+                SpellsArray[i].IsAcquired = false;
             }
         }
         public static void TeleportSpell(Player player, int x, int y)
@@ -166,7 +166,7 @@ namespace FinalProject.Magic
             {
                 Console.SetCursorPosition(coordinates[0] + x, coordinates[1] + y);
                 Console.ForegroundColor = spell.Col;
-                if(!IsSpellTerminate) Console.WriteLine(spell.Symbol);
+                Console.WriteLine(spell.Symbol);
                 Console.ResetColor();
             }
         }

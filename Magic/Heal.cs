@@ -2,15 +2,15 @@
 {
     internal struct Heal
     {
-        readonly public int MPCost = 5;
-        readonly public char Symbol = '+';
+        public readonly char Symbol = '+';
+        public readonly int MPCost = 5;
+        public readonly int Range = 0;
+        public readonly static int Power = 5;
+        public readonly float Speed = 0; ///Speed - lower values are faster
+        public readonly ConsoleColor Col = ConsoleColor.DarkGreen;
+        public readonly ConsoleColor LightCol = ConsoleColor.Green;
         public int Charge = 2;
-        readonly public int Range = 0;
-        readonly public static int Power = 5;
-        readonly public float Speed = 0;
         public bool IsAcquired = false;
-        readonly public ConsoleColor Col = ConsoleColor.DarkGreen;
-        readonly public ConsoleColor LightCol = ConsoleColor.Green;
         public Heal()
         {
 

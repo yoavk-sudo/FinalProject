@@ -19,7 +19,14 @@ namespace FinalProject.Elements
         }
         public static void AddToList(char element, int[] cor)
         {
-            ElementList.Add(element, cor);
+            try
+            {
+                ElementList.Add(element, cor);
+            }
+            catch (ArgumentException)
+            {
+                
+            }
         }
         public static void RemoveFromList(char element)
         {
@@ -34,9 +41,12 @@ namespace FinalProject.Elements
             char element = ElementByCoordinates(cor);
             switch (element)
             {
+                case 'E': //entrance
+                    break;
                 case '¶': //key
                     RemoveFromWorld(element);
                     RemoveFromWorld('█');
+                    Audio.Unlock_DoorSFX();
                     Log.PrintMessage("Somewhere a door has been unlocked...", ConsoleColor.Cyan);
                     break;
                 case '╩': //lever
@@ -46,8 +56,13 @@ namespace FinalProject.Elements
                     LockMethods.SetCursorLockAndOneSpace(cor);
                     RemoveFromWorld('±');
                     RemoveFromWorld('¥');
+                    Audio.PullLeverSFX();
                     Log.PrintMessage("After pulling the lever, a gate has opened", ConsoleColor.Magenta);
-                    //Play SFX?
+                    break;
+                case '¥':
+                case '±':
+                    Audio.LockedGateSFX();
+                    Log.PrintMessage("Locked.", ConsoleColor.Gray);
                     break;
                 case '¡': //wand
                     RemoveFromWorld(element);
@@ -58,11 +73,13 @@ namespace FinalProject.Elements
                     HUD.DisplayHUD(player);
                     break;
                 case '#': //trap
+                    Audio.TrapSFX();
                     Log.PrintMessage("You screamed in pain as bloody spikes pierce your feet", ConsoleColor.Red);
                     break;
                 case '▄':
                     RemoveFromWorld(element);
                     player.GetGold(ChestContentsGenerator());
+                    Audio.TreasureSFX();
                     break;
                 case 'ß': //HP Potion
                     RemoveFromWorld(element);
@@ -78,7 +95,7 @@ namespace FinalProject.Elements
                     HUD.DisplayHUD(player);
                     break;
                 case '§':
-                    PurchaseElement(element, player, 400);
+                    PurchaseElement(element, player, 300);
                     break;
                 case 'î':
                     PurchaseElement(element, player, 500);
@@ -173,11 +190,12 @@ namespace FinalProject.Elements
                     return;
                 }
             }
+            Audio.PurchaseSFX();
             switch (ele)
             {
                 case '§':
                     RemoveFromWorld(ele);
-                    Spells.spells[3].IsAcquired = true;
+                    Spells.SpellsArray[3].IsAcquired = true;
                     Log.PrintMessage($"Got Teleport spell! Press {Controls.KeyLayout["teleport"]} to teleport", ConsoleColor.DarkGreen);
                     Log.PrintControls();
                     Inventory.AddToInventory('§');
