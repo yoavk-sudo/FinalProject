@@ -24,6 +24,7 @@ namespace FinalProject
                     {
                         Console.Write(' ');
                     }
+                    Console.Write(' '); 
                     Console.SetCursorPosition(STARTPOS, position);
                     Console.WriteLine(logList[i - 1]);
                 }

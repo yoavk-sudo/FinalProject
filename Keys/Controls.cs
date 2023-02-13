@@ -94,24 +94,11 @@
                 KeyLayout.Clear();
                 Console.Clear();
             }
-            catch (FormatException ex)
+            catch (FormatException)
             {
                 Console.WriteLine("The input was not a single character.");
                 NewControls();
                 return;
-            }
-            catch (IOException ex)
-            {
-                // Handle the IO exception
-                Console.WriteLine();
-            }
-            catch (OutOfMemoryException ex)
-            {
-                // Handle the out of memory exception
-            }
-            catch (ArgumentOutOfRangeException ex)
-            {
-                // Handle the out of memory exception
             }
         }
     }

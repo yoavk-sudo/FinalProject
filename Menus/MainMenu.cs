@@ -10,6 +10,19 @@ namespace FinalProject.Menus
         const string INSTRUCTIONS = "Most elements in the game can be interacted with when faced directly via the \'e\' key.\n" +
                         "It also allows you to damage enemies from up close, without expending MP with magic.\n" +
                         "After unlocking spells, press their corresponding key to fire them at enemies at a distance.";
+        const string SYNOPSIS = "" +
+                        "As an admirer of magic, you have decided to enroll in the best magic school in the world:\n" +
+                        "Magic school for Talented Intellectuals Learning Teleportation, Arcane and Nature.\n\n" +
+                        "Or TILTAN for short.\n\n" +
+                        "After a grueling but incredibly enjoyable first semester, you find yourself before your first exam in PROGRAMMING.\n" +
+                        "PROGRAMMING of course is also an acronym for something quite magical,\n" +
+                        "but you already forgot what it stands for.\n" +
+                        "For PROGRAMMING, you have arrived at the entrance of a cave. Your teacher speaks...\n\n" +
+                        "\"Before you lies the Cave of Knowledge. Within lie many a treasure, challenges and StackOverflow trolls.\n" +
+                        "Enter the cave and brave the dangers within, and you will exit as wizards in your own right.\n" +
+                        "Good luck.\"\n\n" +
+                        "Hearing the encouraging words, you steel yourself before entering the cave and beginning your adventure...";
+        
         static public void DisplayMainMenu()
         {
             Console.BackgroundColor = ConsoleColor.DarkCyan;
@@ -70,21 +83,9 @@ namespace FinalProject.Menus
                 case 4:
                     Console.Clear();
                     Console.SetCursorPosition(STARTIGNPOS, 3);
-                    Console.WriteLine("Synopsis:");
+                    Console.WriteLine("Synopsis");
                     Console.SetCursorPosition(0, 5);
-                    Console.WriteLine("" +
-                        "As an admirer of magic, you have decided to enroll in the best magic school in the world:\n" +
-                        "Magic school for Talented Intellectuals Learning Teleportation, Arcane and Nature.\n\n" +
-                        "Or TILTAN for short.\n\n" +
-                        "After a grueling but incredibly enjoyable first semester, you find yourself before your first exam in PROGRAMMING.\n" +
-                        "PROGRAMMING of course is also an acronym for something quite magical,\n" +
-                        "but you already forgot what it stands for.\n" +
-                        "For PROGRAMMING, you have arrived at the entrance of a cave. Your teacher speaks...\n\n" +
-                        "\"Before you lies the Cave of Knowledge. Within lie many a treasure, challenges and StackOverflow trolls.\n" +
-                        "Enter the cave and brave the dangers within, and you will exit as wizards in your own right.\n" +
-                        "Good luck.\"\n\n" +
-                        "Hearing the encouraging words, you steel yourself before entering the cave and beginning your adventure..."
-                        );
+                    Console.WriteLine(SYNOPSIS);
                     Console.ReadKey();
                     Console.Clear();
                     DisplayMainMenu(); 

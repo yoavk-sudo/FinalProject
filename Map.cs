@@ -7,10 +7,10 @@ namespace FinalProject
     internal static class Map
     {
         public static bool IsAlive = true;
-        static int _lvlNum = 1;
-        static string LevelPath = MainMenu.Path + "\\Level_0" + LevelNumber + ".txt";
-        public static int[,] MapCol = CollisionMap(LevelPath);
-        public static int LowestTile = File.ReadAllLines(LevelPath).GetLength(0);
+        private static int _lvlNum = 1;
+        private static string _levelPath = MainMenu.Path + "\\Levels\\Level_0" + LevelNumber + ".txt";
+        public static int[,] MapCol = CollisionMap(_levelPath);
+        public static int LowestTile = File.ReadAllLines(_levelPath).GetLength(0);
         private static bool _isAlreadyRunning = false;
         readonly static char[] _bgElemnts = { ' ', '|','-', '╔', '╚', '╗', '╝', '▲' };
 
@@ -19,13 +19,13 @@ namespace FinalProject
             set 
             {
                 _lvlNum = value;
-                LevelPath = MainMenu.Path + "\\Level_0" + _lvlNum + ".txt";
+                _levelPath = MainMenu.Path + "\\Levels\\Level_0" + _lvlNum + ".txt";
             } 
         }
         public static async void PrintMap(Player player)
         {
             PrintUI(player);
-            string[] lines = File.ReadAllLines(LevelPath);
+            string[] lines = File.ReadAllLines(_levelPath);
             lock (LockMethods.ActionLock)
             {
                 Console.SetCursorPosition(0, 0);
@@ -58,35 +58,6 @@ namespace FinalProject
             LevelNumber = 1;
             GameOver.GameOverDisplay();
         }
-        public static async void PrintShop(Player player)
-        {
-            PrintUI(player);
-            string[] lines = File.ReadAllLines(LevelPath);
-            Console.SetCursorPosition(0, 0);
-            foreach (string line in lines)
-            {
-                foreach (char tile in line)
-                {
-                    if (tile == '►')
-                    {
-                        player.Coordinates[0] = Console.GetCursorPosition().Left;
-                        player.Coordinates[1] = Console.GetCursorPosition().Top;
-                        Console.ForegroundColor = ConsoleColor.Blue;
-                        Console.Write('►');
-                        Console.ResetColor();
-                        continue;
-                    }
-                    if (!_bgElemnts.Contains(tile)) CharacterToLogic(tile);
-                    else
-                    {
-                        Console.ForegroundColor = ConsoleColor.DarkYellow;
-                        Console.Write(tile);
-                    }
-                    Console.ResetColor();
-                }
-                Console.WriteLine();
-            }
-        }
         private static void PrintUI(Player player)
         {
             HUD.DisplayHUD(player);
@@ -107,51 +78,35 @@ namespace FinalProject
                 if(maxLength < line.Length) maxLength = line.Length;
             }
             int[,] collision = new int[maxLength, height];
-            foreach(string line in File.ReadAllLines(levelName))
+            lock (LockMethods.ActionLock)
             {
-                if (j >= height) break;
-                foreach(char tile in line)
+                foreach(string line in File.ReadAllLines(levelName))
                 {
-                    if (i >= maxLength) break;
-                    int[] cor = { i, j };
-                    if (tile == ' ' || tile == '▲' || tile == 'E' || tile == '#' || tile == '►') ZeroCoordinate(collision, cor);//collision[i, j] = 0;
-                    else OneCoordinate(collision, cor);//collision[i, j] = 1;
-                    i++;
+                    if (j >= height) break;
+                    foreach(char tile in line)
+                    {
+                        if (i >= maxLength) break;
+                        int[] cor = { i, j };
+                        if (tile == ' ' || tile == '▲' || tile == 'E' || tile == '#' || tile == '►') ZeroCoordinate(collision, cor);//collision[i, j] = 0;
+                        else OneCoordinate(collision, cor);//collision[i, j] = 1;
+                        i++;
+                    }
+                    j++;
+                    i = 0;
                 }
-                j++;
-                i = 0;
             }
             return collision;
         }
-        public static void LoadNextLevel(Player player)
+        public static void ClearCollisionMap()
         {
-            Console.Clear();
-            UpdateLevelPath();
-            EnemyList.TerminateAllEnemies();
-            ElementsList.RemoveAllElements();
-            Log.PrintMessage("Entered floor " + LevelNumber + "...", ConsoleColor.DarkYellow);
-            Log.PrintControls();
-            if (LevelNumber != 6 && LevelNumber != 9)
+            for (int i = 0; i < MapCol.GetLength(0); i++)
             {
-                player.Direction = "up";
-                LowestTile = File.ReadAllLines(LevelPath).GetLength(0);
-                MapCol = CollisionMap(LevelPath);
-                PrintMap(player);
+                for (int j = 0; j < MapCol.GetLength(1); j++)
+                {
+                    ZeroCoordinate(MapCol, new int[] { i, j });
+                }
             }
-            else ShopLevel(player);
         }
-
-        private static void ShopLevel(Player player)
-        {
-            if(LevelNumber == 6) LevelPath = MainMenu.Path + "\\Shop_1.txt";
-            else LevelPath = MainMenu.Path + "\\Shop_2.txt";
-            LowestTile = File.ReadAllLines(LevelPath).GetLength(0);
-            MapCol = CollisionMap(LevelPath);
-            PrintShop(player);
-            Log.PrintMessage("You hear rustling of gold coins as you spot the shopkeeper", ConsoleColor.DarkYellow);
-            LevelPath = MainMenu.Path + "\\Level_06.txt";
-        }
-
         public static int WhatIsInNextTile(int[] coordinates, int[] direction)
         {
             try
@@ -163,11 +118,6 @@ namespace FinalProject
                 Console.WriteLine("2");
             }
             return -1;
-        }
-        private static void UpdateLevelPath()
-        {
-            _lvlNum++;
-            LevelPath = "Level_0" + LevelNumber + ".txt";
         }
         public static void ZeroCoordinate(int[,] map, int[] cor)
         {
@@ -190,15 +140,69 @@ namespace FinalProject
         {
             map[cor[0], cor[1]] = 2;
         }
-        public static void ClearCollisionMap()
+        public static void LoadNextLevel(Player player)
         {
-            for (int i = 0; i < MapCol.GetLength(0); i++)
+            Console.Clear();
+            UpdateLevelPath();
+            EnemyList.TerminateAllEnemies();
+            ElementsList.RemoveAllElements();
+            Log.PrintMessage("Entered floor " + LevelNumber + "...", ConsoleColor.DarkYellow);
+            Log.PrintControls();
+            if (LevelNumber != 6 && LevelNumber != 9)
             {
-                for (int j = 0; j < MapCol.GetLength(1); j++)
+                player.Direction = "up";
+                LowestTile = File.ReadAllLines(_levelPath).GetLength(0);
+                MapCol = CollisionMap(_levelPath);
+                PrintMap(player);
+            }
+            else ShopLevel(player);
+        }
+        private static void UpdateLevelPath()
+        {
+            LevelNumber++;
+            _levelPath = MainMenu.Path + "\\Levels\\Level_0" + LevelNumber + ".txt";
+        }
+        private static async void PrintShop(Player player)
+        {
+            PrintUI(player);
+            string[] lines = File.ReadAllLines(_levelPath);
+            lock (LockMethods.ActionLock)
+            {
+                Console.SetCursorPosition(0, 0);
+                foreach (string line in lines)
                 {
-                    ZeroCoordinate(MapCol, new int[] { i, j });
+                    foreach (char tile in line)
+                    {
+                        if (tile == '►')
+                        {
+                            player.Coordinates[0] = Console.GetCursorPosition().Left;
+                            player.Coordinates[1] = Console.GetCursorPosition().Top;
+                            Console.ForegroundColor = ConsoleColor.Blue;
+                            Console.Write('►');
+                            Console.ResetColor();
+                            continue;
+                        }
+                        if (!_bgElemnts.Contains(tile)) CharacterToLogic(tile);
+                        else
+                        {
+                            Console.ForegroundColor = ConsoleColor.DarkYellow;
+                            Console.Write(tile);
+                        }
+                        Console.ResetColor();
+                    }
+                    Console.WriteLine();
                 }
             }
+        }
+        private static void ShopLevel(Player player)
+        {
+            if(LevelNumber == 6) _levelPath = MainMenu.Path + "\\Levels\\Shop_1.txt";
+            else _levelPath = MainMenu.Path + "\\Levels\\Shop_2.txt";
+            LowestTile = File.ReadAllLines(_levelPath).GetLength(0);
+            MapCol = CollisionMap(_levelPath);
+            PrintShop(player);
+            Log.PrintMessage("You hear rustling of gold coins as you spot the shopkeeper", ConsoleColor.DarkYellow);
+            _levelPath = MainMenu.Path + "\\Levels\\Level_06.txt";
         }
         private static void CharacterToLogic(char ele)
         {
